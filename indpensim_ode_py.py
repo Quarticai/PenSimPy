@@ -1,7 +1,9 @@
 import math
 import numpy as np
+from numba import njit, jit
 
 
+# @njit(nopython=True)
 def indpensim_ode_py(t, y, par):
     """
     ODE for penicillin proecss
@@ -263,7 +265,11 @@ def indpensim_ode_py(t, y, par):
         n += 1
 
     # Total vacuole volume
-    v_2 = sum(phi)
+    # v_2 = sum(phi)
+    v_2 = 0
+    for i in range(len(phi)):
+        v_2 += phi[i]
+
     rho_a1 = (a_1 / ((a_1 / rho_a0) + v_2))
     v_a1 = a_1 / (2 * rho_a1) - v_2
 

@@ -44,8 +44,8 @@ if __name__ == "__main__":
         for Batch_no in range(1, num_of_batches + 1):
             print(f"==== Batch_no: {Batch_no}")
             t = time.time()
-            Xref, h = indpensim_run(Batch_no, batch_run_flags, Recipe_Fs_sp)
-            print(f"=== cost: {int(time.time() - t)} s")
+            Xref, h = indpensim_run(Batch_no, batch_run_flags)
+            print(f"=== cost: {time.time() - t} s")
 
             penicillin_harvested_during_batch = sum([a * b for a, b in zip(Xref.Fremoved.y, Xref.P.y)]) * h
             penicillin_harvested_end_of_batch = Xref.V.y[-1] * Xref.P.y[-1]
@@ -76,6 +76,10 @@ if __name__ == "__main__":
             save_csv(run_id, avg_pHs, avg_Ts, penicillin_yields, median_pH, median_T)
 
     print(f"=== peni_products: {peni_products}")
+    print(f"=== Viscosity_offline: {Xref.Viscosity_offline.y}")
+    # print(f"=== mean: {np.mean(peni_products)}")
+    # print(f"=== std: {np.std(peni_products,ddof=1)}")
+
     # Plot the last res
     if plot_res:
         show_params(Xref)

@@ -6,7 +6,7 @@ import math
 from indpensim_ode_py import indpensim_ode_py
 
 
-def indpensim(xd, x0, h, T, solv, param_list, ctrl_flags, Recipe_Fs_sp):
+def indpensim(xd, x0, h, T, solv, param_list, ctrl_flags):
     """
     Simulate the fermentation process by solving ODE
     :param xd:
@@ -22,12 +22,16 @@ def indpensim(xd, x0, h, T, solv, param_list, ctrl_flags, Recipe_Fs_sp):
     N = int(T / h)
     h_ode = h / 20
     t = np.arange(0, T + h, h)
-    # creates batch structure
+    # creates batch structured
     x = create_batch(h, T)
 
     # User control inputs
     # converts from pH to H+ conc.
     x0.pH = 10 ** (-x0.pH)
+
+    # Recipe_Fs = [15, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 800, 1750]
+    Recipe_Fs_sp = [8, 15, 30, 75, 150, 30, 37, 43, 47, 51, 57, 61, 65, 72, 76, 80, 84, 90, 116, 90, 80]
+    # Recipe_Fs_sp = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
     # main loop
     for k in range(1, N + 1):
@@ -45,6 +49,13 @@ def indpensim(xd, x0, h, T, solv, param_list, ctrl_flags, Recipe_Fs_sp):
             x.T.y[0] = x0.T
 
         # gets MVs
+        # print(f"=== k: {k}")
+        # if k == 20:
+        #     Recipe_Fs_sp_new = input()
+        #     Recipe_Fs_sp_new = [int(ele) for ele in Recipe_Fs_sp_new.split(',')]
+        #     Recipe_Fs_sp = Recipe_Fs_sp_new
+        # print(f"=== Recipe_Fs_sp: {Recipe_Fs_sp}")
+
         u, x = fctrl_indpensim(x, xd, k, h, T, ctrl_flags, Recipe_Fs_sp)
 
         # builds initial conditions and control vectors specific to
@@ -162,6 +173,7 @@ def indpensim(xd, x0, h, T, solv, param_list, ctrl_flags, Recipe_Fs_sp):
 
             par = param_list.copy()
             par.extend(u00)
+
             y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True, args=(par,))
 
         # """
@@ -295,7 +307,7 @@ def indpensim(xd, x0, h, T, solv, param_list, ctrl_flags, Recipe_Fs_sp):
         # Todo
 
         # Off-line measurements recorded
-        if np.remainder(t_span[-1], ctrl_flags.Off_line_m) == 0 or t_span[-1] == 1 or t_span[-1] == T:
+        if np.remainder(t_span[-1], ctrl_flags.Off_line_m) <= 1e-3 or abs(t_span[-1] - 1) <= 1e-3 or abs(t_span[-1] - T) <= 1e-3 :
             delay = ctrl_flags.Off_line_delay
             x.NH3_offline.y[k - 1] = x.NH3.y[k - delay - 1]
             x.NH3_offline.t[k - 1] = x.NH3.t[k - delay - 1]
