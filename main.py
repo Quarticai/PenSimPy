@@ -30,16 +30,16 @@ if __name__ == "__main__":
     recipe = Recipe()
 
     print("=== Run simulation...")
+    avg_pHs = []
+    avg_Ts = []
+    pHs = []
+    Ts = []
+    median_pH = []
+    median_T = []
     for run_id in range(total_runs):
         print(f"=== run_id: {run_id}")
         # For backend APIs
         penicillin_yields = []
-        avg_pHs = []
-        avg_Ts = []
-        pHs = []
-        Ts = []
-        median_pH = []
-        median_T = []
         penicillin_predictions = []
         sum_intensity = np.zeros(2200)
 
@@ -48,7 +48,6 @@ if __name__ == "__main__":
             t = time.time()
             for result in indpensim_run(Batch_no, batch_run_flags, recipe):
                 if result['type'] == 'raman_update':
-                    pass
                     # get intensity
                     intensity = result['Intensity']
                     sum_intensity += intensity
@@ -59,8 +58,8 @@ if __name__ == "__main__":
                     # apply ML model for prediction:  penicillin = Ml(odeintensity)
                     penicillin_predictions.append(1)
 
-                    # TODO: feed intensities to model to get pensim concentration prediction
-                    # TODO: send concentration prediction as well as k via websocket
+                                    # TODO: feed intensities to model to get pensim concentration prediction
+                                    # TODO: send concentration prediction as well as k via websocket
                 elif result['type'] == 'batch_end':
                     # for returning final accuracy and average intensity
                     # TODO: send final accuracy and averaged intensity via websocket
