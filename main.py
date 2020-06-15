@@ -48,7 +48,6 @@ if __name__ == "__main__":
             t = time.time()
             for result in indpensim_run(Batch_no, batch_run_flags, recipe):
                 if result['type'] == 'raman_update':
-                    pass
                     # get intensity
                     intensity = result['Intensity']
                     sum_intensity += intensity
@@ -59,8 +58,8 @@ if __name__ == "__main__":
                     # apply ML model for prediction:  penicillin = Ml(odeintensity)
                     penicillin_predictions.append(1)
 
-                    # TODO: feed intensities to model to get pensim concentration prediction
-                    # TODO: send concentration prediction as well as k via websocket
+                                    # TODO: feed intensities to model to get pensim concentration prediction
+                                    # TODO: send concentration prediction as well as k via websocket
                 elif result['type'] == 'batch_end':
                     # for returning final accuracy and average intensity
                     # TODO: send final accuracy and averaged intensity via websocket
@@ -94,9 +93,9 @@ if __name__ == "__main__":
             print(f"=== penicillin_yield_total: {penicillin_yield_total / 1000}")
 
         pHs = np.array(pHs)
-        median_pH = [statistics.median(pHs[:, i]) for i in range(0, len(pHs[0]))]
+        median_pH = [statistics.median(pHs[:, i]) for i in range(len(pHs[0]))]
         Ts = np.array(Ts)
-        median_T = [statistics.median(Ts[:, i]) for i in range(0, len(Ts[0]))]
+        median_T = [statistics.median(Ts[:, i]) for i in range(len(Ts[0]))]
         peni_products.append(penicillin_yields)
         # Save data
         if save_res == 1:
