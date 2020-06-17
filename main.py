@@ -28,10 +28,11 @@ if __name__ == "__main__":
     peni_products = []
 
     recipe = Recipe()
+    res = []
 
     print("=== Run simulation...")
     for run_id in range(total_runs):
-        print(f"=== run_id: {run_id}")
+        # print(f"=== run_id: {run_id}")
         # For backend APIs
         penicillin_yields = []
         avg_pHs = []
@@ -44,7 +45,7 @@ if __name__ == "__main__":
         sum_intensity = np.zeros(2200)
 
         for Batch_no in range(1, num_of_batches + 1):
-            print(f"==== Batch_no: {Batch_no}")
+            # print(f"==== Batch_no: {Batch_no}")
             t = time.time()
             for result in indpensim_run(Batch_no, batch_run_flags, recipe):
                 if result['type'] == 'raman_update':
@@ -84,6 +85,7 @@ if __name__ == "__main__":
             penicillin_yield_total = penicillin_harvested_end_of_batch - penicillin_harvested_during_batch
 
             penicillin_yields = penicillin_yield_total / 1000
+            res.append(penicillin_yields)
             save_csv(run_id, None, None, penicillin_yields, None, None, Xref)
     #         avg_pH = sum(Xref.pH.y) / len(Xref.pH.y)
     #         avg_pHs.append(avg_pH)
@@ -107,3 +109,5 @@ if __name__ == "__main__":
     # # Plot the last res
     # if plot_res == 1:
     #     show_params(Xref)
+
+    print(res)
