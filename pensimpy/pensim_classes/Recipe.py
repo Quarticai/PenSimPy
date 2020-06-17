@@ -8,8 +8,6 @@ class Recipe:
         Fs = [15, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 800, 1750]
         Fs_sp = [8, 15, 30, 75, 150, 30, 37, 43, 47, 51, 57, 61, 65, 72, 76, 80, 84, 90, 116, 90, 80]
         Fs_sp = [ele * (1 + np.random.randint(-5, 5) / 100) for ele in Fs_sp]
-
-        # [{"step": t, "value": fs } for t, fs in zip(Fs, Fs_sp)]
         self.Fs_trend = get_recipe_trend(Fs, Fs_sp)
 
         Foil = [20, 80, 280, 300, 320, 340, 360, 380, 400, 1750]
