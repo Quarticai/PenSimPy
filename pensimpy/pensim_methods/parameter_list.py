@@ -1,15 +1,14 @@
-def parameter_list(x0, alpha_kla, N_conc_paa, PAA_c):
+def parameter_list(mu_p, mux_max, alpha_kla, N_conc_paa, PAA_c):
     """
     Fixed params for the fermentation process
-    :param x0:
+    :param mu_p:
+    :param mux_max:
     :param alpha_kla:
     :param N_conc_paa:
     :param PAA_c:
     :return:
     """
     # Penicillin model parameters
-    mu_p = x0.mup
-    mux_max = x0.mux
     ratio_mu_e_mu_b = 0.4
     P_std_dev = 0.0015
     mean_P = 0.002
