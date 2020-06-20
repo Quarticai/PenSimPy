@@ -7,7 +7,7 @@ from pensimpy.pensim_methods.raman_sim import raman_sim
 from pensimpy.pensim_classes.Constants import raman_spectra
 
 
-def indpensim(k, x, xd, x0, h, T, param_list, ctrl_flags, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa):
+def indpensim(k, yield_pre, x, xd, x0, h, T, param_list, ctrl_flags, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa):
     """
     Simulate the fermentation process by solving ODE
     :param xd:
@@ -315,4 +315,11 @@ def indpensim(k, x, xd, x0, h, T, param_list, ctrl_flags, Fs, Foil, Fg, Fpres, F
         x.P_offline.t[k - 1] = float('nan')
         x.X_offline.y[k - 1] = float('nan')
         x.X_offline.t[k - 1] = float('nan')
-    return x
+
+    peni_yield = x.V.y[k - 1] * x.P.y[k - 1] / 1000
+    # peni_yield is accumulated penicillin
+    # yield_pre is previous yield
+    # x.Fremoved.y[k - 1] * x.P.y[k - 1] * h / 1000  is the discharged
+    yield_per_run = peni_yield - yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * h / 1000
+
+    return x, peni_yield, yield_per_run
