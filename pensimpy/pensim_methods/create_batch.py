@@ -166,14 +166,12 @@ def create_batch(h, T):
     create_channel(channel, **{'name': 'state nm', 'yUnit': '-', 'tUnit': 'h', 'time': t, 'value': y})
     x.nm = channel
 
-    #
     channel = Channel()
     create_channel(channel, **{'name': 'state phi0', 'yUnit': '-', 'tUnit': 'h', 'time': t, 'value': y})
     x.phi0 = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'carbon dioxide percent in off-gas', 'yUnit': '%', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'carbon dioxide percent in off-gas', 'yUnit': '%', 'tUnit': 'h', 'time': t, 'value': y})
     x.CO2outgas = channel
 
     channel = Channel()
@@ -189,8 +187,7 @@ def create_batch(h, T):
     x.PAA = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'PAA concen. offline', 'yUnit': 'PAA (g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'PAA concen. offline', 'yUnit': 'PAA (g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
     x.PAA_offline = channel
 
     channel = Channel()
@@ -202,41 +199,31 @@ def create_batch(h, T):
     x.NH3 = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'NH_3 concen. off-line', 'yUnit': 'NH3 (g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'NH_3 concen. off-line', 'yUnit': 'NH3 (g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
     x.NH3_offline = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Oxygen in percent in off-gas', 'yUnit': 'O2 (%)', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'Oxygen in percent in off-gas', 'yUnit': 'O2 (%)', 'tUnit': 'h', 'time': t, 'value': y})
     x.O2 = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Specific growth rate of Penicillin', 'yUnit': 'mu_P (h^{-1})', 'tUnit': 'h', 'time': t,
-                      'value': y})
+    create_channel(channel, **{'name': 'Specific growth rate of Penicillin', 'yUnit': 'mu_P (h^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
     x.mup = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Specific growth rate of Biomass', 'yUnit': 'mu_X (h^{-1})', 'tUnit': 'h', 'time': t,
-                      'value': y})
+    create_channel(channel, **{'name': 'Specific growth rate of Biomass', 'yUnit': 'mu_X (h^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
     x.mux = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Offline Penicillin concen.', 'yUnit': 'P(g L^{-1})', 'tUnit': 'h', 'time': t,
-                      'value': y})
+    create_channel(channel, **{'name': 'Offline Penicillin concen.', 'yUnit': 'P(g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
     x.P_offline = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Biomass concen. from CER', 'yUnit': 'g min^{-1}', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'Biomass concen. from CER', 'yUnit': 'g min^{-1}', 'tUnit': 'h', 'time': t, 'value': y})
     x.X_CER = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Offline Biomass concen.', 'yUnit': 'X(g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'Offline Biomass concen.', 'yUnit': 'X(g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
     x.X_offline = channel
 
     channel = Channel()
@@ -244,14 +231,11 @@ def create_batch(h, T):
     x.CER = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Biomass specific growth rate', 'yUnit': 'hr^{-1}', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'Biomass specific growth rate', 'yUnit': 'hr^{-1}', 'tUnit': 'h', 'time': t, 'value': y})
     x.mu_X_calc = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Penicillin specific growth rate', 'yUnit': 'hr^{-1}', 'tUnit': 'h', 'time': t,
-                      'value': y})
+    create_channel(channel, **{'name': 'Penicillin specific growth rate', 'yUnit': 'hr^{-1}', 'tUnit': 'h', 'time': t, 'value': y})
     x.mu_P_calc = channel
 
     channel = Channel()
@@ -263,8 +247,7 @@ def create_batch(h, T):
     x.NH3_shots = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Oxygen Uptake Rate', 'yUnit': '(g min^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'Oxygen Uptake Rate', 'yUnit': '(g min^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
     x.OUR = channel
 
     channel = Channel()
@@ -284,33 +267,26 @@ def create_batch(h, T):
     x.Fault_ref = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': '0-Recipe driven, 1-Operator controlled', 'yUnit': 'Control ref', 'tUnit': 'Batch number',
-                      'time': t, 'value': y})
+    create_channel(channel, **{'name': '0-Recipe driven, 1-Operator controlled', 'yUnit': 'Control ref', 'tUnit': 'Batch number', 'time': t, 'value': y})
     x.Control_ref = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': '1-No Raman spec, 1-Raman spec recorded, 2-PAT control', 'yUnit': 'PAT ref',
-                      'tUnit': 'Batch number', 'time': t, 'value': y})
+    create_channel(channel, **{'name': '1-No Raman spec, 1-Raman spec recorded, 2-PAT control', 'yUnit': 'PAT ref', 'tUnit': 'Batch number', 'time': t, 'value': y})
     x.PAT_ref = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'Batch reference', 'yUnit': 'Batch ref', 'tUnit': 'Batch ref', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'Batch reference', 'yUnit': 'Batch ref', 'tUnit': 'Batch ref', 'time': t, 'value': y})
     x.Batch_ref = channel
 
     channel = Channel()
-    create_channel(channel,
-                   **{'name': 'PAA Prediction.', 'yUnit': 'PAA_pred (g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
+    create_channel(channel, **{'name': 'PAA Prediction.', 'yUnit': 'PAA_pred (g L^{-1})', 'tUnit': 'h', 'time': t, 'value': y})
     x.PAA_pred = channel
 
     # Raman Spectra: Wavenumber & Intensity
     Wavenumber = np.zeros((2200, 1), dtype=float)
     Intensity = np.zeros((int(T / h), 2200), dtype=float)
     channel = Channel()
-    create_channel(channel, **{'name': 'Raman Spectra', 'yUnit': 'a.u', 'tUnit': 'cm^-1',
-                               'Wavenumber': Wavenumber, 'Intensity': Intensity})
+    create_channel(channel, **{'name': 'Raman Spectra', 'yUnit': 'a.u', 'tUnit': 'cm^-1', 'Wavenumber': Wavenumber, 'Intensity': Intensity})
     x.Raman_Spec = channel
 
     return x

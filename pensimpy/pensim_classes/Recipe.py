@@ -33,3 +33,7 @@ class Recipe:
         PAA = [25, 200, 1000, 1500, 1750]
         PAA_sp = [5, 0, 10, 4, 0]
         self.PAA_trend = get_recipe_trend(PAA, PAA_sp)
+
+    def run(self, t):
+        return self.Fs_trend[t], self.Foil_trend[t], self.Fg_trend[t], self.pres_trend[t], self.discharge_trend[t], \
+               self.water_trend[t], self.PAA_trend[t]

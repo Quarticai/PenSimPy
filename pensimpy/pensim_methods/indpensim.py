@@ -7,7 +7,7 @@ from pensimpy.pensim_methods.raman_sim import raman_sim
 from pensimpy.pensim_classes.Constants import raman_spectra
 
 
-def indpensim(k, x, xd, x0, h, T, param_list, ctrl_flags, recipe):
+def indpensim(k, x, xd, x0, h, T, param_list, ctrl_flags, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa):
     """
     Simulate the fermentation process by solving ODE
     :param xd:
@@ -23,13 +23,6 @@ def indpensim(k, x, xd, x0, h, T, param_list, ctrl_flags, recipe):
     h_ode = h / 20
     t = np.arange(0, T + h, h)
 
-    # # creates batch structure
-    # x = create_batch(h, T)
-
-    #todo
-    # for k in range(1, int(T / h) + 1):
-    # while k != int(T / h) + 1:
-
     # fills the batch with just the initial conditions so the control system
     # can provide the first input. These will be overwritten after
     # the ODEs are integrated.
@@ -44,15 +37,7 @@ def indpensim(k, x, xd, x0, h, T, param_list, ctrl_flags, recipe):
         x.T.y[0] = x0.T
 
     # gets MVs
-    # todo
-    u, x = fctrl_indpensim(x, xd, k, h, ctrl_flags,
-                           recipe.Fs_trend[k - 1],
-                           recipe.Foil_trend[k - 1],
-                           recipe.Fg_trend[k - 1],
-                           recipe.pres_trend[k - 1],
-                           recipe.discharge_trend[k - 1],
-                           recipe.water_trend[k - 1],
-                           recipe.PAA_trend[k - 1])
+    u, x = fctrl_indpensim(x, xd, k, h, ctrl_flags, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa)
 
     # builds initial conditions and control vectors specific to
     # indpensim_ode using ode45
@@ -330,6 +315,4 @@ def indpensim(k, x, xd, x0, h, T, param_list, ctrl_flags, recipe):
         x.P_offline.t[k - 1] = float('nan')
         x.X_offline.y[k - 1] = float('nan')
         x.X_offline.t[k - 1] = float('nan')
-    # k += 1
-
     return x
