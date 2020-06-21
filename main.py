@@ -1,7 +1,7 @@
 import time
 from pensimpy.pensim_classes.Recipe import Recipe
 import numpy as np
-from pensimpy.pensim_methods.indpensim import indpensim
+from pensimpy.pensim_classes.Constants import H, Batch_lenghth
 from pensimpy.env_setup.peni_env_setup import PenSimEnv
 import math
 from pensimpy.pensim_classes.Constants import raman_wavenumber
@@ -25,18 +25,20 @@ if __name__ == "__main__":
     t = time.time()
 
     env = PenSimEnv()
-    x, xinterp, x0, H, Batch_lenght, param_list, ctrl_flags = env.reset()
+    x = env.reset()
     recipe = Recipe()
 
     time_stamp, yield_sum, yield_pre = 0, 0, 0
-    while time_stamp != int(Batch_lenght / H):
+    while time_stamp != int(Batch_lenghth / H):
         # time is from 1 to 1150
         time_stamp += 1
 
         # Get action from recipe agent based on time
         Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa = recipe.run(time_stamp - 1)
 
-        x, yield_pre, yield_per_run = env.step(time_stamp, yield_pre, x, xinterp, x0, H, Batch_lenght, param_list, ctrl_flags, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa)
+        x, yield_pre, yield_per_run = env.step(time_stamp, yield_pre,
+                                               x,
+                                               Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa)
 
         yield_sum += yield_per_run
 

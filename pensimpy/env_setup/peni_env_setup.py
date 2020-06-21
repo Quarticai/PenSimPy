@@ -1,5 +1,5 @@
 from pensimpy.pensim_classes.CtrlFlags import CtrlFlags
-from pensimpy.pensim_classes.Constants import H, Batch_lenght
+from pensimpy.pensim_classes.Constants import H, Batch_lenghth
 from pensimpy.pensim_methods.parameter_list import parameter_list
 from pensimpy.pensim_classes.X0 import X0
 from pensimpy.pensim_classes.Xinterp import Xinterp
@@ -13,8 +13,15 @@ from pensimpy.pensim_classes.Constants import raman_spectra
 
 
 class PenSimEnv():
+    def __init__(self):
+        self.x = None
+        self.xinterp = None
+        self.x0 = None
+        self.param_list = None
+        self.ctrl_flags = None
+
     def reset(self):
-        ctrl_flags = CtrlFlags()
+        self.ctrl_flags = CtrlFlags()
 
         # Enbaling seed for repeatable random numbers for different batches
         Random_seed_ref = int(np.ceil(np.random.rand(1)[0] * 1000))
@@ -22,7 +29,7 @@ class PenSimEnv():
         intial_conds = 0.5 + 0.05 * np.random.randn(1)[0]
 
         # create x0
-        x0 = X0(Seed_ref, intial_conds)
+        self.x0 = X0(Seed_ref, intial_conds)
 
         # alpha_kla
         Seed_ref += 14
@@ -40,16 +47,16 @@ class PenSimEnv():
         N_conc_paa = 150000 + 2000 * np.random.randn(1)[0]
 
         # create xinterp
-        xinterp = Xinterp(Random_seed_ref, Batch_lenght, H, np.arange(0, Batch_lenght + H, H))
+        self.xinterp = Xinterp(Random_seed_ref, Batch_lenghth, H, np.arange(0, Batch_lenghth + H, H))
 
         # param list
-        param_list = parameter_list(x0.mup, x0.mux, alpha_kla, N_conc_paa, PAA_c)
+        self.param_list = parameter_list(self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c)
 
         # batch x
-        x = create_batch(H, Batch_lenght)
-        return x, xinterp, x0, H, Batch_lenght, param_list, ctrl_flags
+        x = create_batch(H, Batch_lenghth)
+        return x
 
-    def step(self, k, yield_pre, x, xd, x0, h, T, param_list, ctrl_flags, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa):
+    def step(self, k, yield_pre, x, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa):
         """
         Simulate the fermentation process by solving ODE
         :param xd:
@@ -62,48 +69,48 @@ class PenSimEnv():
         :return:
         """
         # simulation timing init
-        h_ode = h / 20
-        t = np.arange(0, T + h, h)
+        h_ode = H / 20
+        t = np.arange(0, Batch_lenghth + H, H)
 
         # fills the batch with just the initial conditions so the control system
         # can provide the first input. These will be overwritten after
         # the ODEs are integrated.
         if k == 1:
-            x.S.y[0] = x0.S
-            x.DO2.y[0] = x0.DO2
-            x.X.y[0] = x0.X
-            x.P.y[0] = x0.P
-            x.V.y[0] = x0.V
-            x.CO2outgas.y[0] = x0.CO2outgas
-            x.pH.y[0] = x0.pH
-            x.T.y[0] = x0.T
+            x.S.y[0] = self.x0.S
+            x.DO2.y[0] = self.x0.DO2
+            x.X.y[0] = self.x0.X
+            x.P.y[0] = self.x0.P
+            x.V.y[0] = self.x0.V
+            x.CO2outgas.y[0] = self.x0.CO2outgas
+            x.pH.y[0] = self.x0.pH
+            x.T.y[0] = self.x0.T
 
         # gets MVs
-        u, x = fctrl_indpensim(x, xd, k, h, ctrl_flags, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa)
+        u, x = fctrl_indpensim(x, self.xinterp, k, H, self.ctrl_flags, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa)
 
         # builds initial conditions and control vectors specific to
         # indpensim_ode using ode45
         if k == 1:
-            x00 = [x0.S,
-                   x0.DO2,
-                   x0.O2,
-                   x0.P,
-                   x0.V,
-                   x0.Wt,
-                   x0.pH,
-                   x0.T,
+            x00 = [self.x0.S,
+                   self.x0.DO2,
+                   self.x0.O2,
+                   self.x0.P,
+                   self.x0.V,
+                   self.x0.Wt,
+                   self.x0.pH,
+                   self.x0.T,
                    0,
                    4,
-                   x0.Culture_age,
-                   x0.a0,
-                   x0.a1,
-                   x0.a3,
-                   x0.a4,
+                   self.x0.Culture_age,
+                   self.x0.a0,
+                   self.x0.a1,
+                   self.x0.a3,
+                   self.x0.a4,
                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                   x0.CO2outgas,
+                   self.x0.CO2outgas,
                    0,
-                   x0.PAA,
-                   x0.NH3,
+                   self.x0.PAA,
+                   self.x0.NH3,
                    0,
                    0]
         else:
@@ -142,16 +149,16 @@ class PenSimEnv():
                    0]
 
         # Process disturbances
-        distMuP = xd.distMuP.y[k - 1]
-        distMuX = xd.distMuX.y[k - 1]
-        distcs = xd.distcs.y[k - 1]
-        distcoil = xd.distcoil.y[k - 1]
-        distabc = xd.distabc.y[k - 1]
-        distPAA = xd.distPAA.y[k - 1]
-        distTcin = xd.distTcin.y[k - 1]
-        distO_2in = xd.distO_2in.y[k - 1]
+        distMuP = self.xinterp.distMuP.y[k - 1]
+        distMuX = self.xinterp.distMuX.y[k - 1]
+        distcs = self.xinterp.distcs.y[k - 1]
+        distcoil = self.xinterp.distcoil.y[k - 1]
+        distabc = self.xinterp.distabc.y[k - 1]
+        distPAA = self.xinterp.distPAA.y[k - 1]
+        distTcin = self.xinterp.distTcin.y[k - 1]
+        distO_2in = self.xinterp.distO_2in.y[k - 1]
 
-        u00 = [ctrl_flags.Inhib,
+        u00 = [self.ctrl_flags.Inhib,
                u.Fs,
                u.Fg,
                u.RPM,
@@ -167,7 +174,7 @@ class PenSimEnv():
                u.Fpaa,
                u.Foil,
                u.NH3_shots,
-               ctrl_flags.Dis,
+               self.ctrl_flags.Dis,
                distMuP,
                distMuX,
                distcs,
@@ -176,24 +183,24 @@ class PenSimEnv():
                distPAA,
                distTcin,
                distO_2in,
-               ctrl_flags.Vis]
+               self.ctrl_flags.Vis]
 
         # To account for inability of growth rates of biomass and penicillin to
         # return to normal after continuous periods of suboptimal pH and temperature conditions
         # If the Temperature or pH results is off set-point for k> 100 mu_p(max) is reduced to current value
-        if ctrl_flags.Inhib == 1 or ctrl_flags.Inhib == 2:
+        if self.ctrl_flags.Inhib == 1 or self.ctrl_flags.Inhib == 2:
             if k > 65:
                 a1 = np.diff(x.mu_X_calc.y[k - 66:k - 1])
                 a2 = [1 if x < 0 else 0 for x in a1]
                 if sum(a2) >= 63:
-                    param_list[1] = x.mu_X_calc.y[k - 2] * 5
+                    self.param_list[1] = x.mu_X_calc.y[k - 2] * 5
 
         # Solver selection and calling indpensim_ode
         t_start = t[k - 1]
         t_end = t[k]
         t_span = np.arange(t_start, t_end + h_ode, h_ode).tolist()
 
-        par = param_list.copy()
+        par = self.param_list.copy()
         par.extend(u00)
 
         # todo
@@ -305,12 +312,12 @@ class PenSimEnv():
         x.X.t[k - 1] = t_tmp
         x.Fault_ref.y[k - 1] = u.Fault_ref
         x.Fault_ref.t[k - 1] = t_tmp
-        x.Control_ref.y[k - 1] = ctrl_flags.PRBS
-        x.Control_ref.t[k - 1] = ctrl_flags.Batch_Num
-        x.PAT_ref.y[k - 1] = ctrl_flags.Raman_spec
-        x.PAT_ref.t[k - 1] = ctrl_flags.Batch_Num
-        x.Batch_ref.t[k - 1] = ctrl_flags.Batch_Num
-        x.Batch_ref.y[k - 1] = ctrl_flags.Batch_Num
+        x.Control_ref.y[k - 1] = self.ctrl_flags.PRBS
+        x.Control_ref.t[k - 1] = self.ctrl_flags.Batch_Num
+        x.PAT_ref.y[k - 1] = self.ctrl_flags.Raman_spec
+        x.PAT_ref.t[k - 1] = self.ctrl_flags.Batch_Num
+        x.Batch_ref.t[k - 1] = self.ctrl_flags.Batch_Num
+        x.Batch_ref.y[k - 1] = self.ctrl_flags.Batch_Num
 
         # oxygen in air
         O2_in = 0.204
@@ -328,14 +335,14 @@ class PenSimEnv():
         # Adding in Raman Spectra
         # todo
         if k > 10:
-            if ctrl_flags.Raman_spec == 1:
-                x = raman_sim(k, x, h, T, raman_spectra)
-            elif ctrl_flags.Raman_spec == 2:
-                x = raman_sim(k, x, h, T, raman_spectra)
+            if self.ctrl_flags.Raman_spec == 1:
+                x = raman_sim(k, x, H, Batch_lenghth, raman_spectra)
+            elif self.ctrl_flags.Raman_spec == 2:
+                x = raman_sim(k, x, H, Batch_lenghth, raman_spectra)
 
         # Off-line measurements recorded
-        if np.remainder(t_tmp, ctrl_flags.Off_line_m) == 0 or t_tmp == 1 or t_tmp == T:
-            delay = ctrl_flags.Off_line_delay
+        if np.remainder(t_tmp, self.ctrl_flags.Off_line_m) == 0 or t_tmp == 1 or t_tmp == Batch_lenghth:
+            delay = self.ctrl_flags.Off_line_delay
             x.NH3_offline.y[k - 1] = x.NH3.y[k - delay - 1]
             x.NH3_offline.t[k - 1] = x.NH3.t[k - delay - 1]
             x.Viscosity_offline.y[k - 1] = x.Viscosity.y[k - delay - 1]
@@ -362,6 +369,6 @@ class PenSimEnv():
         # peni_yield is accumulated penicillin
         # yield_pre is previous yield
         # x.Fremoved.y[k - 1] * x.P.y[k - 1] * h / 1000  is the discharged
-        yield_per_run = peni_yield - yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * h / 1000
+        yield_per_run = peni_yield - yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * H / 1000
 
         return x, peni_yield, yield_per_run
