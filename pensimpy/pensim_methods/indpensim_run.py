@@ -1,6 +1,6 @@
 from pensimpy.pensim_classes.CtrlFlags import CtrlFlags
 import numpy as np
-from pensimpy.pensim_classes.Constants import H, Batch_lenghth
+from pensimpy.pensim_classes.Constants import H, Batch_length
 from pensimpy.pensim_methods.parameter_list import parameter_list
 from pensimpy.pensim_classes.X0 import X0
 from pensimpy.pensim_classes.Xinterp import Xinterp
@@ -43,9 +43,9 @@ def indpensim_run(recipe):
     ctrl_flags.pH_sp = 6.5
 
     # create xinterp
-    xinterp = Xinterp(Random_seed_ref, Batch_lenghth, H, np.arange(0, Batch_lenghth + H, H))
+    xinterp = Xinterp(Random_seed_ref, Batch_length, H, np.arange(0, Batch_length + H, H))
 
     # param list
     param_list = parameter_list(x0, alpha_kla, N_conc_paa, PAA_c)
 
-    return indpensim(xinterp, x0, H, Batch_lenghth, param_list, ctrl_flags, recipe)
+    return indpensim(xinterp, x0, H, Batch_length, param_list, ctrl_flags, recipe)

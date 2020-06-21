@@ -1,5 +1,5 @@
 from pensimpy.pensim_classes.CtrlFlags import CtrlFlags
-from pensimpy.pensim_classes.Constants import H, Batch_lenghth
+from pensimpy.pensim_classes.Constants import H, Batch_length
 from pensimpy.pensim_methods.parameter_list import parameter_list
 from pensimpy.pensim_classes.X0 import X0
 from pensimpy.pensim_classes.Xinterp import Xinterp
@@ -10,19 +10,20 @@ from scipy.integrate import odeint
 from pensimpy.pensim_methods.indpensim_ode_py import indpensim_ode_py
 from pensimpy.pensim_methods.raman_sim import raman_sim
 from pensimpy.pensim_classes.Constants import raman_spectra
+import math
+from pensimpy.pensim_classes.Constants import raman_wavenumber
 
 
 class PenSimEnv():
     def __init__(self):
-        self.x = None
+        self.x = create_batch(H, Batch_length)
         self.xinterp = None
         self.x0 = None
         self.param_list = None
-        self.ctrl_flags = None
+        self.ctrl_flags = CtrlFlags()
+        self.yield_pre = 0
 
     def reset(self):
-        self.ctrl_flags = CtrlFlags()
-
         # Enbaling seed for repeatable random numbers for different batches
         Random_seed_ref = int(np.ceil(np.random.rand(1)[0] * 1000))
         Seed_ref = 31 + Random_seed_ref
@@ -47,16 +48,14 @@ class PenSimEnv():
         N_conc_paa = 150000 + 2000 * np.random.randn(1)[0]
 
         # create xinterp
-        self.xinterp = Xinterp(Random_seed_ref, Batch_lenghth, H, np.arange(0, Batch_lenghth + H, H))
+        self.xinterp = Xinterp(Random_seed_ref, Batch_length, H, np.arange(0, Batch_length + H, H))
 
         # param list
         self.param_list = parameter_list(self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c)
 
-        # batch x
-        x = create_batch(H, Batch_lenghth)
-        return x
+        return self.x
 
-    def step(self, k, yield_pre, x, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa):
+    def step(self, k, x, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa):
         """
         Simulate the fermentation process by solving ODE
         :param xd:
@@ -70,7 +69,7 @@ class PenSimEnv():
         """
         # simulation timing init
         h_ode = H / 20
-        t = np.arange(0, Batch_lenghth + H, H)
+        t = np.arange(0, Batch_length + H, H)
 
         # fills the batch with just the initial conditions so the control system
         # can provide the first input. These will be overwritten after
@@ -336,12 +335,12 @@ class PenSimEnv():
         # todo
         if k > 10:
             if self.ctrl_flags.Raman_spec == 1:
-                x = raman_sim(k, x, H, Batch_lenghth, raman_spectra)
+                x = raman_sim(k, x, H, Batch_length, raman_spectra)
             elif self.ctrl_flags.Raman_spec == 2:
-                x = raman_sim(k, x, H, Batch_lenghth, raman_spectra)
+                x = raman_sim(k, x, H, Batch_length, raman_spectra)
 
         # Off-line measurements recorded
-        if np.remainder(t_tmp, self.ctrl_flags.Off_line_m) == 0 or t_tmp == 1 or t_tmp == Batch_lenghth:
+        if np.remainder(t_tmp, self.ctrl_flags.Off_line_m) == 0 or t_tmp == 1 or t_tmp == Batch_length:
             delay = self.ctrl_flags.Off_line_delay
             x.NH3_offline.y[k - 1] = x.NH3.y[k - delay - 1]
             x.NH3_offline.t[k - 1] = x.NH3.t[k - delay - 1]
@@ -369,6 +368,15 @@ class PenSimEnv():
         # peni_yield is accumulated penicillin
         # yield_pre is previous yield
         # x.Fremoved.y[k - 1] * x.P.y[k - 1] * h / 1000  is the discharged
-        yield_per_run = peni_yield - yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * H / 1000
+        yield_per_run = peni_yield - self.yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * H / 1000
+        self.yield_pre = peni_yield
 
-        return x, peni_yield, yield_per_run
+        done = True if k == Batch_length / H else False
+        if done:
+            # post process
+            # convert to pH from H+ concentration
+            x.pH.y = [-math.log(pH) / math.log(10) if pH != 0 else pH for pH in x.pH.y]
+            x.Q.y = [Q / 1000 for Q in x.Q.y]
+            x.Raman_Spec.Wavenumber = raman_wavenumber
+
+        return x, yield_per_run, done

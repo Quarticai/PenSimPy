@@ -35,5 +35,6 @@ class Recipe:
         self.PAA_trend = get_recipe_trend(PAA, PAA_sp)
 
     def run(self, t):
+        t -= 1
         return self.Fs_trend[t], self.Foil_trend[t], self.Fg_trend[t], self.pres_trend[t], self.discharge_trend[t], \
                self.water_trend[t], self.PAA_trend[t]
