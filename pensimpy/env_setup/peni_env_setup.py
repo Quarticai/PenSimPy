@@ -24,6 +24,9 @@ class PenSimEnv():
         self.yield_pre = 0
 
     def reset(self):
+        """
+        Setup the envs and return the observation class x.
+        """
         # Enbaling seed for repeatable random numbers for different batches
         Random_seed_ref = int(np.ceil(np.random.rand(1)[0] * 1000))
         Seed_ref = 31 + Random_seed_ref
@@ -58,14 +61,6 @@ class PenSimEnv():
     def step(self, k, x, Fs, Foil, Fg, Fpres, Fdischarge, Fw, Fpaa):
         """
         Simulate the fermentation process by solving ODE
-        :param xd:
-        :param x0:
-        :param h:
-        :param T:
-        :param param_list:
-        :param ctrl_flags:
-        :param recipe:
-        :return:
         """
         # simulation timing init
         h_ode = H / 20
