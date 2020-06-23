@@ -10,7 +10,6 @@ from pensimpy.pensim_classes.Constants import raman_spectra
 from pensimpy.pensim_classes.Constants import raman_wavenumber
 from pensimpy.pensim_classes.U import U
 
-from pensimpy.pensim_methods.parameter_list import parameter_list
 from pensimpy.pensim_methods.create_batch import create_batch
 from pensimpy.pensim_methods.indpensim_ode_py import indpensim_ode_py
 
@@ -60,7 +59,8 @@ class PenSimEnv:
                                np.arange(0, self.batch_length + self.time_step, self.time_step))
 
         # param list
-        self.param_list = parameter_list(self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c)
+        # self.param_list = parameter_list(self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c)
+        self.param_list = [self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c]
 
         # create the observation class
         x = create_batch(self.time_step, self.batch_length)
@@ -204,9 +204,12 @@ class PenSimEnv:
 
         par = self.param_list.copy()
         par.extend(u00)
+        # todo
+        x00.extend(par)
 
         # todo
-        y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True, args=(par,))
+        # y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True, args=(par,))
+        y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True)
         y_sol = y_sol[-1]
         t_tmp = t_span[-1]
 
