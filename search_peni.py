@@ -112,10 +112,11 @@ recipe_discharge_sp = [0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 
 recipe_water_sp = [0, 500, 100, 0, 400, 150, 250, 0, 100]
 
 """defines the search space"""
-space = []
 manup_scale = 0.08
-for Fs in recipe_Fs_sp:
-    space.append(Integer(int(Fs - Fs * manup_scale), int(Fs + Fs * manup_scale)))
+space = [
+    Integer(int(Fs - Fs * manup_scale), int(Fs + Fs * manup_scale))
+    for Fs in recipe_Fs_sp
+]
 
 for Foil in recipe_Foil_sp:
     space.append(Integer(int(Foil - Foil * manup_scale), int(Foil + Foil * manup_scale)))
