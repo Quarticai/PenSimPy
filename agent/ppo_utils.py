@@ -36,6 +36,9 @@ class EpisodeBuffer:
         self.gamma, self.lam = gamma, lam
         self.ptr, self.max_size = 0, size
 
+        self.adv_mean, self.adv_std = 0, 0
+        self.obs_mean, self.obs_std = np.zeros(size), np.zeros(size)
+
     def store(self, obs, act, rew, val, logp):
         """
         Append one timestep of agent-environment interaction to the buffer.

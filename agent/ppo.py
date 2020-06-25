@@ -10,11 +10,11 @@ class Actor(nn.Module):
     """Gaussian Actor"""
     def __init__(self, obs_dim, act_dim):
         super().__init__()
-        log_std = -0.1 * np.ones(act_dim, dtype=np.float32)
+        log_std = -0.5 * np.ones(act_dim, dtype=np.float32)
         self.log_std = torch.nn.Parameter(torch.as_tensor(log_std))
-        self.mu_net = nn.Sequential(nn.Linear(obs_dim, 32),
+        self.mu_net = nn.Sequential(nn.Linear(obs_dim, 64),
                                     nn.Tanh(),
-                                    nn.Linear(32, act_dim),
+                                    nn.Linear(64, act_dim),
                                     nn.Tanh())
 
     def _distribution(self, obs):
@@ -36,9 +36,9 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     def __init__(self, obs_dim):
         super().__init__()
-        self.v_net = nn.Sequential(nn.Linear(obs_dim, 32),
+        self.v_net = nn.Sequential(nn.Linear(obs_dim, 64),
                                    nn.Tanh(),
-                                   nn.Linear(32, 1))
+                                   nn.Linear(64, 1))
 
     def forward(self, obs):
         return torch.squeeze(self.v_net(obs), -1)
@@ -65,7 +65,7 @@ class ActorCritic(nn.Module):
 class PPO:
     def __init__(self, obs_dim, act_dim, buffer_size, actor_critic=ActorCritic,
                  gamma=0.99, clip_ratio=0.2, pi_lr=3e-4, vf_lr=1e-3,
-                 train_pi_iters=5, train_v_iters=5, lam=0.97, target_kl=0.01):
+                 train_pi_iters=2, train_v_iters=2, lam=0.97, target_kl=0.01):
         self.ac = actor_critic(obs_dim, act_dim)
         self.buffer = EpisodeBuffer(obs_dim, act_dim, buffer_size, gamma, lam)
         self.pi_optimizer = optim.Adam(self.ac.pi.parameters(), lr=pi_lr)
