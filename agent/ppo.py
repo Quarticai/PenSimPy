@@ -10,7 +10,7 @@ class Actor(nn.Module):
     """Gaussian Actor"""
     def __init__(self, obs_dim, act_dim):
         super().__init__()
-        log_std = -0.5 * np.ones(act_dim, dtype=np.float32)
+        log_std = -0.1 * np.ones(act_dim, dtype=np.float32)
         self.log_std = torch.nn.Parameter(torch.as_tensor(log_std))
         self.mu_net = nn.Sequential(nn.Linear(obs_dim, 64),
                                     nn.Tanh(),
@@ -64,8 +64,8 @@ class ActorCritic(nn.Module):
 
 class PPO:
     def __init__(self, obs_dim, act_dim, buffer_size, actor_critic=ActorCritic,
-                 gamma=0.99, clip_ratio=0.2, pi_lr=3e-4, vf_lr=1e-3,
-                 train_pi_iters=2, train_v_iters=2, lam=0.97, target_kl=0.01):
+                 gamma=0.9, clip_ratio=0.5, pi_lr=1e-3, vf_lr=1e-3,
+                 train_pi_iters=3, train_v_iters=5, lam=0.97, target_kl=0.05):
         self.ac = actor_critic(obs_dim, act_dim)
         self.buffer = EpisodeBuffer(obs_dim, act_dim, buffer_size, gamma, lam)
         self.pi_optimizer = optim.Adam(self.ac.pi.parameters(), lr=pi_lr)

@@ -52,13 +52,10 @@ for e in range(episodes):
         next_o = np.array([x[1] for x in observation])
 
         """in this setting we just collect reward in the end of the batch"""
-        if not done:
-            r = 0
-            agent.buffer.store(o, a, r, v, logp)
-            o = next_o
+        agent.buffer.store(o, a, reward, v, logp)
+        o = next_o
 
         batch_yield += reward
-    agent.buffer.store(o, a, batch_yield, v, logp)
     agent.buffer.finish_path()
     agent.update()
 
@@ -66,3 +63,4 @@ for e in range(episodes):
     avg_yields.append(batch_yield)
 
 print(np.mean(avg_yields))
+# 3531
