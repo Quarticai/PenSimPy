@@ -205,16 +205,16 @@ class PenSimEnv:
         par = self.param_list.copy()
         par.extend(u00)
         # todo
-        x00.extend(par)
+        # x00.extend(par)
 
         # todo
-        # y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True, args=(par,))
-        y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True)
+        y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True, args=(par,))
+        # y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True)
         y_sol = y_sol[-1]
         t_tmp = t_span[-1]
 
-        # Defining minimum value for all variables for numerical stability
-        y_sol[0:31] = [0.001 if ele <= 0 else ele for ele in y_sol[0:31]]
+        # # Defining minimum value for all variables for numerical stability
+        # y_sol[0:31] = [0.001 if ele <= 0 else ele for ele in y_sol[0:31]]
 
         # Saving all manipulated variables
         x.Fg.t[k - 1] = t_tmp
