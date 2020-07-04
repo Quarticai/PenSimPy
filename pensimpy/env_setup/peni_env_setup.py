@@ -15,6 +15,7 @@ from pensimpy.pensim_methods.indpensim_ode_py import indpensim_ode_py
 
 from pensimpy.helper.PIDSimple3 import PIDSimple3
 from pensimpy.helper.smooth_py import smooth_py
+import odeint_11
 
 
 class PenSimEnv:
@@ -208,10 +209,8 @@ class PenSimEnv:
         # x00.extend(par)
 
         # todo
-        y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True, args=(par,))
-        # y_sol = odeint(indpensim_ode_py, x00, t_span, tfirst=True)
-        y_sol = y_sol[-1]
-        t_tmp = t_span[-1]
+        y_sol = odeint_11.integrate(x00, par, t_start, t_end + h_ode, h_ode)
+        t_tmp = t_end + h_ode
 
         # # Defining minimum value for all variables for numerical stability
         # y_sol[0:31] = [0.001 if ele <= 0 else ele for ele in y_sol[0:31]]
