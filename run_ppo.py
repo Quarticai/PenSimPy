@@ -4,8 +4,8 @@ from pensimpy.env_setup.peni_env_setup import PenSimEnv
 import numpy as np
 import torch
 from agent import PPO
-import os.path
 import random
+import pickle
 
 obs_dim = 15
 act_dim = 7
@@ -62,34 +62,42 @@ def main():
 
     for i in range(4):
         """time step where agent is allowed to actions"""
-        if os.path.isfile('agent.pt'):
-            agent = torch.load('agent.pt')
-        else:
+        if i == 0:
             agent = PPO(obs_dim, act_dim, buffer_size=1150)
 
+        else:
+            agent = torch.load(f'agent_{i-1}.pt')
+
         """run one episode"""
-        avg_yields = []
-        t = time.time()
+        avg_yields_dt = []
+        t_dt = time.time()
 
         for e in range(episodes_digital_twin):
             batch_yield, agent = learn_one_episode(random.randint(1, 1000), agent)
-            print(f"digital twin episode: {e}, elapsed time: {int(time.time() - t)} s, digital twin batch_yield: {batch_yield}")
-            avg_yields.append(batch_yield)
-        res['digital_twin_'+str(i)] = np.mean(avg_yields)
-        print('=====average digital_twin_' + str(i) + ': ' + str(np.mean(avg_yields)) + '=======')
+            print(f"digital twin episode: {e}, elapsed time: {int(time.time() - t_dt)} s, digital twin batch_yield: {batch_yield}")
+            avg_yields_dt.append(batch_yield)
+        res[f'digital_twin_{i}_batch_yield'] = avg_yields_dt
+        res[f'digital_twin_{i}_average_yield'] = np.mean(avg_yields_dt)
+        print('=====average digital_twin_' + str(i) + ': ' + str(np.mean(avg_yields_dt)) + '=======')
 
-        torch.save(agent, 'agent.pt')
+        torch.save(agent, f'agent_{i}.pt')
 
-        avg_yields = []
-        t = time.time()
+        avg_yields_p = []
+        t_p = time.time()
         for e in range(episodes_production):
             batch_yield, agent = learn_one_episode(274, agent)
-            print(f"production episode: {e}, elapsed time: {int(time.time() - t)} s, production batch_yield: {batch_yield}")
-            avg_yields.append(batch_yield)
-        res['production_' + str(i)] = np.mean(avg_yields)
-        print('=====average production_' + str(i)+ ': '+ str(np.mean(avg_yields)) + '=======')
+            print(f"production episode: {e}, elapsed time: {int(time.time() - t_p)} s, production batch_yield: {batch_yield}")
+            avg_yields_p.append(batch_yield)
+        res[f'production_{i}_batch_yield'] = avg_yields_p
+        res[f'production_{i}_average_yield'] = np.mean(avg_yields_p)
+        print('=====average production_' + str(i)+ ': '+ str(np.mean(avg_yields_p)) + '=======')
+
     print('==============res=============')
     print(res)
+
+    with open('res.pkl', 'wb') as f:
+        pickle.dump(res, f)
+
 
 if __name__ == '__main__':
     main()
