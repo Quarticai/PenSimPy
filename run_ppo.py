@@ -11,7 +11,7 @@ obs_dim = 15
 act_dim = 7
 episodes_digital_twin = 3000
 episodes_production = 100
-res = []
+res = {}
 
 def learn_one_episode(seed, agent):
     env = PenSimEnv(random_seed_ref=seed)  # 3361 with recipe
@@ -76,6 +76,7 @@ def main():
             print(f"digital twin episode: {e}, elapsed time: {int(time.time() - t)} s, digital twin batch_yield: {batch_yield}")
             avg_yields.append(batch_yield)
         res['digital_twin_'+str(i)] = np.mean(avg_yields)
+        print('=====average digital_twin_' + str(i) + ': ' + str(np.mean(avg_yields)) + '=======')
 
         torch.save(agent, 'agent.pt')
 
@@ -86,6 +87,8 @@ def main():
             print(f"production episode: {e}, elapsed time: {int(time.time() - t)} s, production batch_yield: {batch_yield}")
             avg_yields.append(batch_yield)
         res['production_' + str(i)] = np.mean(avg_yields)
+        print('=====average production_' + str(i)+ ': '+ str(np.mean(avg_yields)) + '=======')
+    print('==============res=============')
     print(res)
 
 if __name__ == '__main__':
