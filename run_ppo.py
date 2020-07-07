@@ -60,7 +60,7 @@ def learn_one_episode(seed, agent):
 
 def main():
 
-    for i in range(4):
+    for _ in range(4):
         """time step where agent is allowed to actions"""
         if os.path.isfile('agent.pt'):
             agent = torch.load('agent.pt')
