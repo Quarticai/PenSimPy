@@ -15,7 +15,7 @@ from pensimpy.pensim_methods.indpensim_ode_py import indpensim_ode_py
 
 from pensimpy.helper.PIDSimple3 import PIDSimple3
 from pensimpy.helper.smooth_py import smooth_py
-import odeint_11
+import fastodeint
 
 
 class PenSimEnv:
@@ -72,7 +72,7 @@ class PenSimEnv:
         Simulate the fermentation process by solving ODE
         """
         # simulation timing init
-        h_ode = self.time_step / 20
+        h_ode = self.time_step / 40
         t = np.arange(0, self.batch_length + self.time_step, self.time_step)
 
         # fills the batch with just the initial conditions so the control system
@@ -205,15 +205,12 @@ class PenSimEnv:
 
         par = self.param_list.copy()
         par.extend(u00)
-        # todo
-        # x00.extend(par)
 
-        # todo
-        y_sol = odeint_11.integrate(x00, par, t_start, t_end + h_ode, h_ode)
+        y_sol = fastodeint.integrate(x00, par, t_start, t_end + h_ode, h_ode)
         t_tmp = t_end + h_ode
 
         # # Defining minimum value for all variables for numerical stability
-        # y_sol[0:31] = [0.001 if ele <= 0 else ele for ele in y_sol[0:31]]
+        y_sol[0:31] = [0.001 if ele <= 0 else ele for ele in y_sol[0:31]]
 
         # Saving all manipulated variables
         x.Fg.t[k - 1] = t_tmp
