@@ -37,8 +37,7 @@ def create_model(hypers):
         kterms.append(rbf * cos)
 
     k = np.sum(kterms) + Linear(D) + Bias(D)
-    m = GPR(X_train, Y_train, kern=k)
-    return m
+    return GPR(X_train, Y_train, kern=k)
 
 
 X_test, X_complete = data['X_test'], data['X_complete']
