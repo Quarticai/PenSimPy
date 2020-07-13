@@ -93,11 +93,14 @@ class RecipeBuilder:
              0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 0,
              0, 500, 100, 0, 400, 150, 250, 0, 100]
         yields = []
-        for i in range(len(X)):
+        for item in X:
             # water_sp = X[i].tolist()
             # Fs_sp, Foil_sp, Fg_sp, pres_sp, discharge_sp, _ = self.split(x)
 
-            Fs_sp, Foil_sp, Fg_sp, pres_sp, discharge_sp, water_sp = self.split(X[i].tolist())
+            Fs_sp, Foil_sp, Fg_sp, pres_sp, discharge_sp, water_sp = self.split(
+                item.tolist()
+            )
+
 
             env = PenSimEnv(random_seed_ref=self.random_int)
             done = False
