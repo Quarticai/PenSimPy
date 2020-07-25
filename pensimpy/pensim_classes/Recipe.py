@@ -10,7 +10,15 @@ class Recipe:
         discharge = [500, 510, 650, 660, 750, 760, 850, 860, 950, 960, 1050, 1060, 1150, 1160, 1250, 1260, 1350, 1360, 1750]
         water = [250, 375, 750, 800, 850, 1000, 1250, 1350, 1750]
 
-        Fs_sp, Foil_sp, Fg_sp, pres_sp, discharge_sp, water_sp = self.split(x)
+        x_default = [8, 15, 30, 75, 150, 30, 37, 43, 47, 51, 57, 61, 65, 72, 76, 80, 84, 90, 116, 90, 80,
+             22, 30, 35, 34, 33, 32, 31, 30, 29, 23,
+             30, 42, 55, 60, 75, 65, 60,
+             0.6, 0.7, 0.8, 0.9, 1.1, 1, 0.9, 0.9,
+             0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 0,
+             0, 500, 100, 0, 400, 150, 250, 0, 100]
+
+        Fs_sp, Foil_sp, Fg_sp, _, _, _ = self.split(x)
+        _, _, _, pres_sp, discharge_sp, water_sp = self.split(x_default)
         self.discharge_trend = get_recipe_trend(discharge, discharge_sp)
         self.pres_trend = get_recipe_trend(pres, pres_sp)
         self.Fg_trend = get_recipe_trend(Fg, Fg_sp)

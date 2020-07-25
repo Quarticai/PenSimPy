@@ -59,7 +59,16 @@ class RecipeBuilder:
         return recipe_Fs_sp, recipe_Foil_sp, recipe_Fg_sp, recipe_pres_sp, recipe_discharge_sp, recipe_water_sp
 
     def get_batch_yield(self, sp_points):
-        Fs_sp, Foil_sp, Fg_sp, pres_sp, discharge_sp, water_sp = self.split(sp_points)
+        # default
+        x = [8, 15, 30, 75, 150, 30, 37, 43, 47, 51, 57, 61, 65, 72, 76, 80, 84, 90, 116, 90, 80,
+             22, 30, 35, 34, 33, 32, 31, 30, 29, 23,
+             30, 42, 55, 60, 75, 65, 60,
+             0.6, 0.7, 0.8, 0.9, 1.1, 1, 0.9, 0.9,
+             0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 0,
+             0, 500, 100, 0, 400, 150, 250, 0, 100]
+
+        Fs_sp, Foil_sp, Fg_sp, _, _, _ = self.split(sp_points)
+        _, _, _, pres_sp, discharge_sp, water_sp = self.split(x)
 
         #env = PenSimEnv(random_seed_ref=self.random_int)
         env = PenSimEnv(random_seed_ref=np.random.randint(1000))
@@ -98,7 +107,7 @@ class RecipeBuilder:
              0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 0,
              0, 500, 100, 0, 400, 150, 250, 0, 100]
 
-        x0 = [7, 13, 30, 76, 148, 29, 33, 47, 44, 49, 51, 67, 59, 75, 83, 86, 75, 87, 120, 99, 88, 21, 33, 38, 33, 31, 30, 31, 32, 30, 25, 29, 46, 54, 66, 79, 68, 62, 0.6016503902342087, 0.707284455287067, 0.7454938930799496, 0.9697537579503417, 1.161999329699155, 0.9, 0.9574409087102624, 0.8908383114570896, 0, 4086, 0, 3969, 1, 3936, 0, 4344, 1, 3675, 0, 4094, 0, 3741, 0, 4392, 0, 4246, 0, 1, 0, 489, 97, 0, 363, 146, 252, 0, 94]
+        # x0 = [7, 13, 30, 76, 148, 29, 33, 47, 44, 49, 51, 67, 59, 75, 83, 86, 75, 87, 120, 99, 88, 21, 33, 38, 33, 31, 30, 31, 32, 30, 25, 29, 46, 54, 66, 79, 68, 62, 0.6016503902342087, 0.707284455287067, 0.7454938930799496, 0.9697537579503417, 1.161999329699155, 0.9, 0.9574409087102624, 0.8908383114570896, 0, 4086, 0, 3969, 1, 3936, 0, 4344, 1, 3675, 0, 4094, 0, 3741, 0, 4392, 0, 4246, 0, 1, 0, 489, 97, 0, 363, 146, 252, 0, 94]
 
         num_iter = 0
 
@@ -114,7 +123,7 @@ class RecipeBuilder:
                 recipe_pres_sp, recipe_discharge_sp, recipe_water_sp = self.split(x)
 
                 recipe_Fs_sp_opt, recipe_Foil_sp_opt, recipe_Fg_sp_opt, \
-                recipe_pres_sp_opt, recipe_discharge_sp_opt, recipe_water_sp_opt = self.split(x0)
+                recipe_pres_sp_opt, recipe_discharge_sp_opt, recipe_water_sp_opt = self.split(x)
 
                 for Fs, Fs_opt in zip(recipe_Fs_sp, recipe_Fs_sp_opt):
                     lower_bound, upper_bound = self.get_bound(Fs, Fs_opt, manup_scale)
@@ -128,50 +137,52 @@ class RecipeBuilder:
                     lower_bound, upper_bound = self.get_bound(Fg, Fg_opt, manup_scale)
                     space.append(Integer(int(lower_bound), int(upper_bound)))
 
-                for pres, pres_opt in zip(recipe_pres_sp, recipe_pres_sp_opt):
-                    lower_bound, upper_bound = self.get_bound(pres, pres_opt, manup_scale)
-                    space.append(Real(lower_bound, upper_bound))
+                print(f"=== space: {len(space)}")
 
-                for discharge, discharge_opt in zip(recipe_discharge_sp, recipe_discharge_sp_opt):
-                    if discharge != 0:
-                        lower_bound, upper_bound = self.get_bound(discharge, discharge_opt, manup_scale)
-                        space.append(Integer(int(lower_bound), int(upper_bound)))
-                    else:
-                        space.append(Integer(0, 1))
+                # for pres, pres_opt in zip(recipe_pres_sp, recipe_pres_sp_opt):
+                #     lower_bound, upper_bound = self.get_bound(pres, pres_opt, manup_scale)
+                #     space.append(Real(lower_bound, upper_bound))
+                #
+                # for discharge, discharge_opt in zip(recipe_discharge_sp, recipe_discharge_sp_opt):
+                #     if discharge != 0:
+                #         lower_bound, upper_bound = self.get_bound(discharge, discharge_opt, manup_scale)
+                #         space.append(Integer(int(lower_bound), int(upper_bound)))
+                #     else:
+                #         space.append(Integer(0, 1))
+                #
+                # for water, water_opt in zip(recipe_water_sp, recipe_water_sp_opt):
+                #     if water != 0:
+                #         lower_bound, upper_bound = self.get_bound(water, water_opt, manup_scale)
+                #         space.append(Integer(int(lower_bound), int(upper_bound)))
+                #     else:
+                #         space.append(Integer(0, 1))
 
-                for water, water_opt in zip(recipe_water_sp, recipe_water_sp_opt):
-                    if water != 0:
-                        lower_bound, upper_bound = self.get_bound(water, water_opt, manup_scale)
-                        space.append(Integer(int(lower_bound), int(upper_bound)))
-                    else:
-                        space.append(Integer(0, 1))
+            # if num_iter == 0:
+            #     res_gp = gp_minimize(self.get_batch_yield,
+            #                          space,
+            #                          n_calls=n_calls,
+            #                          n_random_starts=n_random_starts,
+            #                          random_state=np.random.randint(1000),
+            #                          n_jobs=-1)
+            # else:
+            #     res_gp = gp_minimize(self.get_batch_yield,
+            #                          space,
+            #                          x0=x0,
+            #                          n_calls=n_calls,
+            #                          n_random_starts=n_random_starts,
+            #                          random_state=np.random.randint(1000),
+            #                          n_jobs=-1)
 
-            if num_iter == 0:
-                res_gp = gp_minimize(self.get_batch_yield,
-                                     space,
-                                     n_calls=n_calls,
-                                     n_random_starts=n_random_starts,
-                                     random_state=np.random.randint(1000),
-                                     n_jobs=-1)
-            else:
-                res_gp = gp_minimize(self.get_batch_yield,
-                                     space,
-                                     x0=x0,
-                                     n_calls=n_calls,
-                                     n_random_starts=n_random_starts,
-                                     random_state=np.random.randint(1000),
-                                     n_jobs=-1)
-
-            # res_gp = gp_minimize(self.get_batch_yield,
-            #                      space,
-            #                      n_calls=n_calls,
-            #                      n_random_starts=n_random_starts,
-            #                      random_state=np.random.randint(1000),
-            #                      n_jobs=-1)
+            res_gp = gp_minimize(self.get_batch_yield,
+                                 space,
+                                 n_calls=n_calls,
+                                 n_random_starts=n_random_starts,
+                                 random_state=np.random.randint(1000),
+                                 n_jobs=-1)
 
             num_iter += 1
             total_calls -= n_calls
-            x0 = res_gp.x
+            # x0 = res_gp.x
             yields_summary.extend(res_gp.func_vals.tolist())
             recipe_summary.extend(res_gp.x_iters)
 
@@ -181,9 +192,11 @@ class RecipeBuilder:
 for _ in range(1, 2):
     recipe_builder = RecipeBuilder(random_int=None)
     yields, recipes = recipe_builder.benchmark(total_calls=100, n_calls=100, n_random_starts=4, manup_scale=0.1)
-    print(len(yields))
+    new_yields = [-ele for ele in yields]
+    print(len(new_yields))
     print(len(recipes))
-    print(yields)
+    print(f"=== max yield: {max(new_yields)}")
+    print(recipes[new_yields.index(max(new_yields))])
 
     # import matplotlib.pyplot as plt
     #
@@ -201,10 +214,10 @@ for _ in range(1, 2):
 
     import pickle
 
-    with open(f'100_1st_layer_office_yield', 'wb') as fp:
+    with open(f'100_1st_layer_home_yield_38', 'wb') as fp:
         pickle.dump(yields, fp)
 
-    with open(f'100_1st_layer_office_recipe', 'wb') as fp:
+    with open(f'100_1st_layer_home_recipe_38', 'wb') as fp:
         pickle.dump(recipes, fp)
 
 # import pickle

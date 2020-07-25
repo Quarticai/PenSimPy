@@ -151,21 +151,6 @@ class RecipeBuilder:
                     else:
                         space.append(Integer(0, 1))
 
-            # if num_iter == 0:
-            #     res_gp = gp_minimize(self.get_batch_yield,
-            #                          space,
-            #                          n_calls=n_calls,
-            #                          n_random_starts=n_random_starts,
-            #                          random_state=np.random.randint(1000),
-            #                          n_jobs=-1)
-            # else:
-            #     res_gp = gp_minimize(self.get_batch_yield,
-            #                          space,
-            #                          x0=x0,
-            #                          n_calls=n_calls,
-            #                          n_random_starts=n_random_starts,
-            #                          random_state=np.random.randint(1000),
-            #                          n_jobs=-1)
 
             res_gp = gp_minimize(self.get_batch_yield,
                                  space,
