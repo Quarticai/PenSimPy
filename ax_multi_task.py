@@ -169,13 +169,12 @@ def max_utility_from_GP(n, m, experiment, search_space, gr):
     # Compute expected utility
     u = -np.array(f['objective'])
     best_arm_indx = np.flip(np.argsort(u))[:n]
-    gr_new = GeneratorRun(
+    return GeneratorRun(
         arms=[
             gr.arms[i] for i in best_arm_indx
         ],
         weights=[1.] * n,
     )
-    return gr_new
 
 
 # This function runs a multi-task Bayesian optimization loop, as outlined in Algorithm 1 and above.
