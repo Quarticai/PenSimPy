@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import time
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 
@@ -9,6 +10,7 @@ from pensimpy.pensim_classes.Xinterp import Xinterp
 from pensimpy.pensim_classes.Constants import raman_spectra
 from pensimpy.pensim_classes.Constants import raman_wavenumber
 from pensimpy.pensim_classes.U import U
+from pensimpy.pensim_classes.Recipe import Recipe
 
 from pensimpy.pensim_methods.create_batch import create_batch
 from pensimpy.pensim_methods.indpensim_ode_py import indpensim_ode_py
@@ -20,16 +22,26 @@ import fastodeint
 
 
 class PenSimEnv:
-    def __init__(self, random_seed_ref, fast=True):
+    def __init__(self, setpoints=None, random_seed=0, fast=True, num_batches=1):
         self.xinterp = None
         self.x0 = None
         self.param_list = None
         self.ctrl_flags = CtrlFlags()
         self.yield_pre = 0
-        self.random_seed_ref = random_seed_ref
+        self.random_seed_ref = random_seed
         self.time_step = 0.2  # [hour]
         self.batch_length = 230  # [hour]
         self.fast = fast
+        self.num_batches = num_batches
+        if setpoints is not None:
+            self.setpoints = setpoints
+        else:
+            self.setpoints = [8, 15, 30, 75, 150, 30, 37, 43, 47, 51, 57, 61, 65, 72, 76, 80, 84, 90, 116, 90, 80,
+                              22, 30, 35, 34, 33, 32, 31, 30, 29, 23,
+                              30, 42, 55, 60, 75, 65, 60,
+                              0.6, 0.7, 0.8, 0.9, 1.1, 1, 0.9, 0.9,
+                              0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 0,
+                              0, 500, 100, 0, 400, 150, 250, 0, 100]
 
     def reset(self):
         """
@@ -776,3 +788,29 @@ class PenSimEnv:
         x.Raman_Spec.Intensity[k - 1, :] = np.squeeze(New_Spectra_noise + term1 + term2 + term3).tolist()
 
         return x
+
+    def get_batches(self):
+        for batch_id in range(self.num_batches):
+            t = time.time()
+            done = False
+            observation, batch_data = self.reset()
+            recipe = Recipe(self.setpoints)
+
+            time_stamp, batch_yield, yield_pre = 0, 0, 0
+            while not done:
+                # time is from 1 to 1150
+                time_stamp += 1
+
+                # Get action from recipe agent based on time
+                Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = recipe.run(time_stamp)
+
+                # Run and get the reward
+                # observation is a class which contains all the variables, e.g. observation.Fs.y[k], observation.Fs.t[k]
+                # are the Fs value and corresponding time at k
+                observation, batch_data, reward, done = self.step(time_stamp,
+                                                                 batch_data,
+                                                                 Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
+                batch_yield += reward
+
+            print(f"=== Time cost: {int(time.time() - t)} s")
+            print(f"=== Yield: {batch_yield} at batch id {batch_id}")
