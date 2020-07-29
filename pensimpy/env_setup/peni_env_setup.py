@@ -17,12 +17,14 @@ from pensimpy.pensim_methods.indpensim_ode_py import indpensim_ode_py
 
 from pensimpy.helper.PIDSimple3 import PIDSimple3
 from pensimpy.helper.smooth_py import smooth_py
+from pensimpy.helper.show_params import show_params
+from pensimpy.helper.save_csv import save_csv
 from pensimpy.helper.get_observation_data import get_observation_data
 import fastodeint
 
 
 class PenSimEnv:
-    def __init__(self, setpoints=None, random_seed=0, fast=True, num_batches=1):
+    def __init__(self, setpoints=None, random_seed=0, fast=True):
         self.xinterp = None
         self.x0 = None
         self.param_list = None
@@ -32,16 +34,22 @@ class PenSimEnv:
         self.time_step = 0.2  # [hour]
         self.batch_length = 230  # [hour]
         self.fast = fast
-        self.num_batches = num_batches
         if setpoints is not None:
             self.setpoints = setpoints
         else:
-            self.setpoints = [8, 15, 30, 75, 150, 30, 37, 43, 47, 51, 57, 61, 65, 72, 76, 80, 84, 90, 116, 90, 80,
-                              22, 30, 35, 34, 33, 32, 31, 30, 29, 23,
-                              30, 42, 55, 60, 75, 65, 60,
-                              0.6, 0.7, 0.8, 0.9, 1.1, 1, 0.9, 0.9,
-                              0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 4000, 0, 0,
-                              0, 500, 100, 0, 400, 150, 250, 0, 100]
+            self.setpoints = {
+                'Fs': [(15, 8), (60, 15), (80, 30), (100, 75), (120, 150), (140, 30), (160, 37), (180, 43), (200, 47),
+                       (220, 51), (240, 57), (260, 61), (280, 65), (300, 72), (320, 76), (340, 80), (360, 84),
+                       (380, 90), (400, 116), (800, 90), (1750, 80)],
+                'Foil': [(20, 22), (80, 30), (280, 35), (300, 34), (320, 33), (340, 32), (360, 31), (380, 30),
+                         (400, 29), (1750, 23)],
+                'Fg': [(40, 30), (100, 42), (200, 55), (450, 60), (1000, 75), (1250, 65), (1750, 60)],
+                'pres': [(62, 0.6), (125, 0.7), (150, 0.8), (200, 0.9), (500, 1.1), (750, 1), (1000, 0.9), (1750, 0.9)],
+                'discharge': [(500, 0), (510, 4000), (650, 0), (660, 4000), (750, 0), (760, 4000), (850, 0),
+                              (860, 4000), (950, 0), (960, 4000), (1050, 0), (1060, 4000), (1150, 0), (1160, 4000),
+                              (1250, 0), (1260, 4000), (1350, 0), (1360, 4000), (1750, 0)],
+                'water': [(250, 0), (375, 500), (750, 100), (800, 0), (850, 400), (1000, 150), (1250, 250), (1350, 0),
+                          (1750, 100)]}
 
     def reset(self):
         """
@@ -789,8 +797,8 @@ class PenSimEnv:
 
         return x
 
-    def get_batches(self):
-        for batch_id in range(self.num_batches):
+    def get_batches(self, num_batches=1, include_raman=False):
+        for batch_id in range(num_batches):
             t = time.time()
             done = False
             observation, batch_data = self.reset()
@@ -812,4 +820,6 @@ class PenSimEnv:
                                                                  Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
                 batch_yield += reward
 
-            print(f"=== Yield {round(batch_yield, 3)} Kg at batch {batch_id} in {round(time.time() - t, 3)}s")
+            print(f"=== Yield {round(batch_yield, 6)} Kg at batch {batch_id} in {round(time.time() - t, 3)}s")
+            save_csv(batch_data, batch_id, include_raman)
+            # show_params(batch_data)
