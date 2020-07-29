@@ -812,5 +812,4 @@ class PenSimEnv:
                                                                  Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
                 batch_yield += reward
 
-            print(f"=== Time cost: {int(time.time() - t)} s")
-            print(f"=== Yield: {batch_yield} at batch id {batch_id}")
+            print(f"=== Yield {round(batch_yield, 3)} Kg at batch {batch_id} in {round(time.time() - t, 3)}s")
