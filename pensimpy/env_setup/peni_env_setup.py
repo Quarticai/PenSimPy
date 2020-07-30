@@ -18,7 +18,6 @@ from pensimpy.pensim_methods.indpensim_ode_py import indpensim_ode_py
 
 from pensimpy.helper.PIDSimple3 import PIDSimple3
 from pensimpy.helper.smooth_py import smooth_py
-from pensimpy.helper.show_params import show_params
 from pensimpy.helper.save_csv import save_csv
 from pensimpy.helper.get_observation_data import get_observation_data
 import fastodeint
@@ -794,7 +793,7 @@ class PenSimEnv:
 
         return x
 
-    def get_batches(self, random_seed=0, setpoints=None, include_raman=False, plot_batch=False):
+    def get_batches(self, random_seed=0, setpoints=None, include_raman=False):
         self.random_seed_ref = random_seed
         if setpoints is not None:
             for k, v in setpoints.items():
@@ -830,5 +829,3 @@ class PenSimEnv:
 
         print(f"=== Yield {round(batch_yield, 6)} Kg at batch {batch_id} in {round(time.time() - t, 3)}s")
         save_csv(batch_data, batch_id, include_raman)
-        if plot_batch:
-            show_params(batch_data)
