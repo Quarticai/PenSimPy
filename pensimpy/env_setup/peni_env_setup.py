@@ -24,13 +24,13 @@ import fastodeint
 
 
 class PenSimEnv:
-    def __init__(self, setpoints=None, random_seed=0, fast=True):
+    def __init__(self, fast=True):
         self.xinterp = None
         self.x0 = None
         self.param_list = None
         self.ctrl_flags = CtrlFlags()
         self.yield_pre = 0
-        self.random_seed_ref = random_seed
+        self.random_seed_ref = 0
         self.time_step = 0.2  # [hour]
         self.batch_length = 230  # [hour]
         self.fast = fast
@@ -46,13 +46,6 @@ class PenSimEnv:
             'discharge': [(100.0, 0), (102.0, 4000), (130.0, 0), (132.0, 4000), (150.0, 0), (152.0, 4000), (170.0, 0),
                           (172.0, 4000), (190.0, 0), (192.0, 4000), (210.0, 0), (212.0, 4000), (230.0, 0)],
             'water': [(50.0, 0), (75.0, 500), (150.0, 100), (160.0, 0), (170.0, 400), (200.0, 150), (230.0, 250)]}
-
-        for k, v in setpoints.items():
-            if k not in {'Fs', 'Foil', 'Fg', 'pres', 'discharge', 'water'}:
-                raise ValueError(f"{k} id not a correct key. Valid options are Fs, Foil, Fg, pres, discharge and water")
-            if max(v, key=lambda ele: ele[0])[0] > 230 or min(v, key=lambda ele: ele[0])[0] < 0:
-                raise ValueError("Recipe time exceeds range, should be greater than 0 and less than 230 [H]")
-            self.setpoints[k] += v
 
     def reset(self):
         """
@@ -800,7 +793,17 @@ class PenSimEnv:
 
         return x
 
-    def get_batches(self, num_batches=1, include_raman=False):
+    def get_batches(self, random_seed=0, setpoints=None, num_batches=1, include_raman=False, plot_batch=False):
+        self.random_seed_ref = random_seed
+        if setpoints is not None:
+            for k, v in setpoints.items():
+                if k not in {'Fs', 'Foil', 'Fg', 'pres', 'discharge', 'water'}:
+                    raise ValueError(f"{k} id not a correct key. "
+                                     f"Valid options are Fs, Foil, Fg, pres, discharge and water")
+                if max(v, key=lambda ele: ele[0])[0] > 230 or min(v, key=lambda ele: ele[0])[0] < 0:
+                    raise ValueError("Recipe time exceeds range, should be greater than 0 and less than 230 [H]")
+                self.setpoints[k] += v
+
         for batch_id in range(num_batches):
             t = time.time()
             done = False
@@ -808,6 +811,7 @@ class PenSimEnv:
             recipe = Recipe(self.setpoints)
 
             time_stamp, batch_yield, yield_pre = 0, 0, 0
+            self.yield_pre = 0
             while not done:
                 # time is from 1 to 1150
                 time_stamp += 1
@@ -819,10 +823,11 @@ class PenSimEnv:
                 # observation is a class which contains all the variables, e.g. observation.Fs.y[k], observation.Fs.t[k]
                 # are the Fs value and corresponding time at k
                 observation, batch_data, reward, done = self.step(time_stamp,
-                                                                 batch_data,
-                                                                 Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
+                                                                  batch_data,
+                                                                  Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
                 batch_yield += reward
 
             print(f"=== Yield {round(batch_yield, 6)} Kg at batch {batch_id} in {round(time.time() - t, 3)}s")
             save_csv(batch_data, batch_id, include_raman)
-            # show_params(batch_data)
+            if plot_batch:
+                show_params(batch_data)
