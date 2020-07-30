@@ -6,4 +6,4 @@ if __name__ == "__main__":
     setpoints_dict = {'water': [(100, 121)]}
 
     env = PenSimEnv()
-    env.get_batches(random_seed=1, setpoints=setpoints_dict, include_raman=False)
+    env.get_batches(random_seed=1, setpoints=setpoints_dict, include_raman=False, batch_path='./data')

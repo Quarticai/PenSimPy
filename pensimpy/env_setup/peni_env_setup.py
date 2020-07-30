@@ -1,7 +1,6 @@
 import numpy as np
 import math
 import time
-from datetime import datetime
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 
@@ -794,7 +793,7 @@ class PenSimEnv:
 
         return x
 
-    def get_batches(self, random_seed=0, setpoints=None, include_raman=False):
+    def get_batches(self, batch_path, random_seed=0, setpoints=None, include_raman=False):
         self.random_seed_ref = random_seed
         if setpoints is not None:
             for k, v in setpoints.items():
@@ -805,7 +804,6 @@ class PenSimEnv:
                     raise ValueError("Recipe time exceeds range, should be greater than 0 and less than 230 [H]")
                 self.setpoints[k] += v
 
-        batch_id = datetime.now()
         t = time.time()
         done = False
         observation, batch_data = self.reset()
@@ -828,5 +826,5 @@ class PenSimEnv:
                                                               Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
             batch_yield += reward
 
-        print(f"=== Yield {round(batch_yield, 6)} Kg at batch {batch_id} in {round(time.time() - t, 3)}s")
-        save_csv(batch_data, batch_id, include_raman)
+        print(f"=== Yield {round(batch_yield, 6)} Kg in {round(time.time() - t, 3)}s")
+        save_csv(batch_data, batch_path, include_raman)
