@@ -24,6 +24,9 @@ import fastodeint
 
 
 class PenSimEnv:
+    TIME_STEP = 0.2  # [hour]
+    BATCH_LENGTH = 230  # [hour]
+
     def __init__(self, fast=True):
         self.xinterp = None
         self.x0 = None
@@ -31,8 +34,6 @@ class PenSimEnv:
         self.ctrl_flags = CtrlFlags()
         self.yield_pre = 0
         self.random_seed_ref = 0
-        self.time_step = 0.2  # [hour]
-        self.batch_length = 230  # [hour]
         self.fast = fast
         self.setpoints = {
             'Fs': [(3.0, 8), (12.0, 15), (16.0, 30), (20.0, 75), (24.0, 150), (28.0, 30), (32.0, 37), (36.0, 43),
@@ -75,15 +76,15 @@ class PenSimEnv:
         N_conc_paa = 150000 + 2000 * np.random.randn(1)[0]
 
         # create xinterp
-        self.xinterp = Xinterp(self.random_seed_ref, self.batch_length, self.time_step,
-                               np.arange(0, self.batch_length + self.time_step, self.time_step))
+        self.xinterp = Xinterp(self.random_seed_ref, self.BATCH_LENGTH, self.TIME_STEP,
+                               np.arange(0, self.BATCH_LENGTH + self.TIME_STEP, self.TIME_STEP))
 
         # param list
         # self.param_list = parameter_list(self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c)
         self.param_list = [self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c]
 
         # create the observation class
-        x = create_batch(self.time_step, self.batch_length)
+        x = create_batch(self.TIME_STEP, self.BATCH_LENGTH)
 
         # get observation
         observation = get_observation_data(x, 0)
@@ -94,8 +95,8 @@ class PenSimEnv:
         Simulate the fermentation process by solving ODE
         """
         # simulation timing init
-        h_ode = self.time_step / 40
-        t = np.arange(0, self.batch_length + self.time_step, self.time_step)
+        h_ode = self.TIME_STEP / 40
+        t = np.arange(0, self.BATCH_LENGTH + self.TIME_STEP, self.TIME_STEP)
 
         # fills the batch with just the initial conditions so the control system
         # can provide the first input. These will be overwritten after
@@ -368,7 +369,7 @@ class PenSimEnv:
                 x = self.raman_sim(k, x)
 
         # Off-line measurements recorded
-        if np.remainder(t_tmp, self.ctrl_flags.Off_line_m) == 0 or t_tmp == 1 or t_tmp == self.batch_length:
+        if np.remainder(t_tmp, self.ctrl_flags.Off_line_m) == 0 or t_tmp == 1 or t_tmp == self.BATCH_LENGTH:
             delay = self.ctrl_flags.Off_line_delay
             x.NH3_offline.y[k - 1] = x.NH3.y[k - delay - 1]
             x.NH3_offline.t[k - 1] = x.NH3.t[k - delay - 1]
@@ -398,12 +399,12 @@ class PenSimEnv:
         # peni_yield is accumulated penicillin
         # yield_pre is previous yield
         # x.Fremoved.y[k - 1] * x.P.y[k - 1] * h / 1000  is the discharged
-        yield_per_run = peni_yield - self.yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * self.time_step / 1000
+        yield_per_run = peni_yield - self.yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * self.TIME_STEP / 1000
         self.yield_pre = peni_yield
 
         observation = get_observation_data(x, k - 1)
 
-        done = True if k == self.batch_length / self.time_step else False
+        done = True if k == self.BATCH_LENGTH / self.TIME_STEP else False
         if done:
             # post process
             # convert to pH from H+ concentration
@@ -464,17 +465,17 @@ class PenSimEnv:
         if ph_err >= -0.05:
             ph_on_off = 1
             if k == 1:
-                Fb = PIDSimple3(x.Fb.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.time_step)
+                Fb = PIDSimple3(x.Fb.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.TIME_STEP)
             else:
-                Fb = PIDSimple3(x.Fb.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.time_step)
+                Fb = PIDSimple3(x.Fb.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.TIME_STEP)
             Fa = 0
         elif ph_err <= -0.05:
             ph_on_off = 1
             if k == 1:
-                Fa = PIDSimple3(x.Fa.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.time_step)
+                Fa = PIDSimple3(x.Fa.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.TIME_STEP)
                 Fb = 0
             else:
-                Fa = PIDSimple3(x.Fa.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.time_step)
+                Fa = PIDSimple3(x.Fa.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.TIME_STEP)
                 Fb = x.Fb.y[k - 2] * 0.5
         else:
             ph_on_off = 0
@@ -525,18 +526,18 @@ class PenSimEnv:
         if temp_err <= 0.05:
             temp_on_off = 0
             if k == 1:
-                Fc = PIDSimple3(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.time_step)
+                Fc = PIDSimple3(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.TIME_STEP)
                 Fh = 0
             else:
-                Fc = PIDSimple3(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.time_step)
+                Fc = PIDSimple3(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.TIME_STEP)
                 Fh = x.Fh.y[k - 2] * 0.1
         else:
             temp_on_off = 1
             if k == 1:
-                Fh = PIDSimple3(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.time_step)
+                Fh = PIDSimple3(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.TIME_STEP)
                 Fc = 0
             else:
-                Fh = PIDSimple3(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.time_step)
+                Fh = PIDSimple3(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.TIME_STEP)
                 Fc = x.Fc.y[k - 2] * 0.3
         Fc = 1e-4 if Fc < 1e-4 else Fc
         Fh = 1e-4 if Fh < 1e-4 else Fh
@@ -670,7 +671,7 @@ class PenSimEnv:
                 PAA_err1 = PAA_sp - x.PAA.y[k - 3]
 
             # builds the temperature history of current and previous two samples
-            if k * self.time_step >= 10:
+            if k * self.TIME_STEP >= 10:
                 if k == 1 or k == 2:
                     temp = x.PAA_pred.y[0]
                     temp1 = x.PAA_pred.y[0]
@@ -685,9 +686,9 @@ class PenSimEnv:
                     temp2 = x.PAA_pred.y[k - 5]
 
                 if k == 1:
-                    Fpaa = PIDSimple3(x.Fpaa.y[0], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.time_step)
+                    Fpaa = PIDSimple3(x.Fpaa.y[0], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.TIME_STEP)
                 else:
-                    Fpaa = PIDSimple3(x.Fpaa.y[k - 2], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.time_step)
+                    Fpaa = PIDSimple3(x.Fpaa.y[k - 2], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.TIME_STEP)
 
         # Controller vector
         u.Fg = Fg
@@ -723,7 +724,7 @@ class PenSimEnv:
         Product_S = x.P.y[k - 1] / 40
         Biomass_S = x.X.y[k - 1] / 40
         Viscosity_S = x.Viscosity.y[k - 1] / 100
-        Time_S = k / (self.batch_length / self.time_step)
+        Time_S = k / (self.BATCH_LENGTH / self.TIME_STEP)
         Intensity_increase1 = a * Biomass_S + b * Product_S + c * Viscosity_S + d * Time_S
         scaling_factor = 370000
         Gluc_increase = 1714.2857142857142
