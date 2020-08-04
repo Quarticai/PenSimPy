@@ -1,6 +1,6 @@
 import numpy as np
-from pensimpy.pensim_classes.X import X
-from pensimpy.pensim_classes.Channel import Channel
+from pensimpy.pensim_classes.x import X
+from pensimpy.pensim_classes.channel import Channel
 
 
 def create_batch(h, T):

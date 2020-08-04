@@ -4,13 +4,13 @@ import time
 from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 
-from pensimpy.pensim_classes.CtrlFlags import CtrlFlags
-from pensimpy.pensim_classes.X0 import X0
-from pensimpy.pensim_classes.Xinterp import Xinterp
-from pensimpy.pensim_classes.Constants import raman_spectra
-from pensimpy.pensim_classes.Constants import raman_wavenumber
-from pensimpy.pensim_classes.U import U
-from pensimpy.pensim_classes.Recipe import Recipe
+from pensimpy.pensim_classes.ctrl_flags import CtrlFlags
+from pensimpy.pensim_classes.x0 import X0
+from pensimpy.pensim_classes.xinterp import Xinterp
+from pensimpy.pensim_classes.constants import raman_spectra
+from pensimpy.pensim_classes.constants import raman_wavenumber
+from pensimpy.pensim_classes.u import U
+from pensimpy.pensim_classes.recipe import Recipe
 
 from pensimpy.pensim_methods.create_batch import create_batch
 from pensimpy.pensim_methods.indpensim_ode_py import indpensim_ode_py
