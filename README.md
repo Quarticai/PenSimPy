@@ -9,20 +9,14 @@ Sequential Batch Control strategy is realized and all the recipe's feed can be m
 we incorporate the Reinforcement Learning to improve the penicillin gain and present this as example code.
 Also, a web application based on PenSimPy can be found [here](http://quartic.ddns.net:8000/).
 
-#### How to install
+Installation
+============
 ```
 pip install pensimpy
 ```
-#### How to use
-Sequential batch control example can be found here:
-```
-from pensimpy import PenSimEnv
-
-# Provide recipes for Fs, Foil, Fg, pres, discharge, water
-# Recipe time range: 0 < t <= 230
-setpoints_dict = {'water': [(100, 11)]}
-
-env = PenSimEnv()
-df, df_raman = env.get_batches(random_seed=1, setpoints=setpoints_dict, include_raman=False)
-```
+Examples
+============
+See the `examples` directory
+- run `examples/batch_generation_example.py <https://github.com/Quarticai/PenSimPy/blob/refactor_opensource/pensimpy/examples/batch_generation_example.py>` to realize 
+Sequential Batch Control with modified recipe feed
 
