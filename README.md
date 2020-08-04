@@ -17,6 +17,6 @@ pip install pensimpy
 Examples
 ============
 See the `examples` directory
-- run `examples/batch_generation_example.py <https://github.com/Quarticai/PenSimPy/blob/refactor_opensource/pensimpy/examples/batch_generation_example.py>` to realize 
-Sequential Batch Control with modified recipe feed
+- run [examples/batch_generation_example.py](pensimpy/examples/batch_generation_example.py) to generate
+batch and Raman data with self-designed recipes
 
