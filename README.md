@@ -1,39 +1,28 @@
 ![alt text](figures/logo_light.png "Logo Title Text 1")
-# PenSimPy ![](https://img.shields.io/badge/python-3.6.8-orange)
-Python version of [IndPenSim](http://www.industrialpenicillinsimulation.com/). Sequential batch control, Raman spectra simulation, PRBS (pseudo random binary signal),
-Faults (Aeration rate fault, Vessel back pressure fault...) and Substrate prediction are enabled. 
-A fresh web application based on PenSimPy and [Quartic.AI](https://quartic.ai/) can be found [here](http://quartic.ddns.net:8000/).
 
-#### How to execute
-```
-pip install -r requirements.txt
-python main.py
-```
-#### Setup in main.py
-```
-* Using Raman Spectra by default
-* No PRBS and Faults are applied by default
-```
-#### Results
-##### Inputs
-<p align="center">
-  <img src="https://github.com/Quarticai/PenSimPy/blob/master/figures/Figure_2.png" width="60%">
-</p>
+**Status:** Maintenance (expect bug fixes and updates)
+# PenSimPy ![](https://img.shields.io/badge/python-3.6.8-orange) ![](https://img.shields.io/badge/c%2B%2B-11-blue)
+PenSimPy is a python version of [IndPenSim](http://www.industrialpenicillinsimulation.com/), which simulates the industrial penicillin
+yield process. Additionally, the PenSimPy is based on c++ to solve the ODE functions so as to achieve a faster performance. 
+Basic batch data and Raman simulation data can be generated in Pandas dataframes with different random seeds. A conventionally used 
+Sequential Batch Control strategy is realized and all the recipe's feed can be manually updated as setpoints by the user. Further, 
+we incorporate the Reinforcement Learning to improve the penicillin gain and present this as example code.
+Also, a web application based on PenSimPy can be found [here](http://quartic.ddns.net:8000/).
 
-##### Outputs
-<p align="center">
-  <img src="https://github.com/Quarticai/PenSimPy/blob/master/figures/Figure_1.png" width="60%">
-</p>
+#### How to install
+```
+pip install pensimpy
+```
+#### How to use
+Sequential batch control example can be found here:
+```
+from pensimpy import PenSimEnv
 
-##### Csv data generation
+# Provide recipes for Fs, Foil, Fg, pres, discharge, water
+# Recipe time range: 0 < t <= 230
+setpoints_dict = {'water': [(100, 11)]}
+
+env = PenSimEnv()
+df, df_raman = env.get_batches(random_seed=1, setpoints=setpoints_dict, include_raman=False)
 ```
-/path/to/PenSimPy/data/0/batch_median_trend.csv
-/path/to/PenSimPy/data/0/batch_statistics.csv
-/path/to/PenSimPy/data/0/raman.csv
-```
-#### Benchmark
-##### Time cost with Raman Simulation (* MacBook Pro (15-inch, 2018); 2.2 GHz 6-Core Intel Core i7; 16 GB 2400 MHz DDR4)
-<p align="center">
-  <img src="https://github.com/Quarticai/PenSimPy/blob/master/figures/benchmark.png" width="88%">
-</p>
 
