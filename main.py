@@ -1,4 +1,4 @@
-from pensimpy.env_setup.peni_env_setup import PenSimEnv
+from pensimpy.peni_env_setup import PenSimEnv
 
 if __name__ == "__main__":
     # Provide recipes for Fs, Foil, Fg, pres, discharge, water

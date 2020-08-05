@@ -1,4 +1,4 @@
-from pensimpy.helper.get_recipe_trend import get_recipe_trend
+from pensimpy.utils.get_recipe_trend import get_recipe_trend
 
 
 class Recipe:

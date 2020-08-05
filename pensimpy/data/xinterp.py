@@ -1,4 +1,4 @@
-from pensimpy.pensim_classes.channel import Channel
+from pensimpy.data.channel import Channel
 import numpy as np
 from scipy.signal import lfilter
 

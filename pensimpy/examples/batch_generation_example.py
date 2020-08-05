@@ -1,6 +1,6 @@
 import sys
 sys.path.append("../..")
-from pensimpy.env_setup.peni_env_setup import PenSimEnv
+from pensimpy.peni_env_setup import PenSimEnv
 
 
 # Provide recipes for Fs, Foil, Fg, pres, discharge, water
