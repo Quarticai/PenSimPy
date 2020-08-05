@@ -85,6 +85,7 @@ class ProcessVariable:
         else:
             self._setpoint_time_max = time_key
 
+    @Decorator.populate_setpoint_value_lookup
     def update_setpoint(self, setpoint):
         time_key = setpoint.get_time_until_in_minutes()
 
@@ -256,6 +257,6 @@ class Recipe:
 
     def update_process_variable_setpoints(self, process_variable_name, *setpoints):
         if process_variable_name in self._process_variables_lookup:
-            self._process_variables_lookup[process_variable_name].update_setpoints(setpoints)
+            self._process_variables_lookup[process_variable_name].update_setpoints(*setpoints)
         else:
             raise KeyError("Process variable name not found")
