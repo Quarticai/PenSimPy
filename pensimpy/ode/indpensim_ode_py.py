@@ -226,8 +226,7 @@ def indpensim_ode_py(t, yyy, par):
 
     # Main rate equations for kinetic expressions
     # Penicillin inhibition curve
-    P_inhib = 2.5 * P_std_dev * (
-            (P_std_dev * 2.5066282746310002) ** -1 * math.exp(-0.5 * ((s - mean_P) / P_std_dev) ** 2))
+    P_inhib = 2.5 * P_std_dev * ((P_std_dev * 2.5066282746310002) ** -1 * math.exp(-0.5 * ((s - mean_P) / P_std_dev) ** 2))
 
     # Specific growth rates of biomass regions with inhibition effect
     mu_a0 = ratio_mu_e_mu_b * mux_max * pH_inhib * NH3_inhib * T_inhib * DO_2_inhib_X * CO2_inhib * PAA_inhib_X
@@ -363,7 +362,6 @@ def indpensim_ode_py(t, yyy, par):
     #   Process parameters
     #
     # Defining the column vector
-    # dy = np.zeros((33, 1))
     dy = [0] * 33
 
     # Substrate utilization
@@ -480,8 +478,7 @@ def indpensim_ode_py(t, yyy, par):
     # N
     X_C_nitrogen = (-r_b0 - r_e1 - r_d1 - r_d4) * Y_NX
     P_C_nitrogen = -dP_dt * Y_NP
-    dy[30] = (NH3_shots * N_conc_shot) / yyy[4] + X_C_nitrogen + P_C_nitrogen - m_N * total_X + (
-            1 * N_conc_paa * Fpaa / yyy[4]) + N_conc_oil * Foil / yyy[4] - yyy[30] * dilution / yyy[4]
+    dy[30] = (NH3_shots * N_conc_shot) / yyy[4] + X_C_nitrogen + P_C_nitrogen - m_N * total_X + (1 * N_conc_paa * Fpaa / yyy[4]) + N_conc_oil * Foil / yyy[4] - yyy[30] * dilution / yyy[4]
     dy[31] = mu_p
     dy[32] = mu_e
     return dy
