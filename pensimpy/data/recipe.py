@@ -81,9 +81,7 @@ class ProcessVariable:
 
         if self._setpoint_time_min is None:
             self._setpoint_time_min = time_key
-            self._setpoint_time_max = time_key
-        else:
-            self._setpoint_time_max = time_key
+        self._setpoint_time_max = time_key
 
     @Decorator.populate_setpoint_value_lookup
     def update_setpoint(self, setpoint):
@@ -119,8 +117,7 @@ class ProcessVariable:
         if t_minute > self._setpoint_time_max and forward_fill is True:
             return self._setpoint_value_lookup[self._setpoint_time_max]
         try:
-            value = self._setpoint_value_lookup[t_minute]
-            return value
+            return self._setpoint_value_lookup[t_minute]
         except KeyError as e:
             raise RuntimeError(f'Unable to find value at {t_minute} minutes for process '
                                f'variable "{self.name}"') from e
