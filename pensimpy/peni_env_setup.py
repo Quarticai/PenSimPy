@@ -41,26 +41,26 @@ class PenSimEnv:
         """
         # Enbaling seed for repeatable random numbers for different batches
         seed_ref = 31 + self.random_seed_ref
-        np.random.seed(seed_ref)
-        intial_conds = 0.5 + 0.05 * np.random.randn(1)[0]
+        random_state = np.random.RandomState(seed_ref)
+        intial_conds = 0.5 + 0.05 * random_state.randn(1)[0]
 
         # create x0
         self.x0 = X0(seed_ref, intial_conds)
 
         # alpha_kla
         seed_ref += 14
-        np.random.seed(seed_ref)
-        alpha_kla = 85 + 10 * np.random.randn(1)[0]
+        random_state = np.random.RandomState(seed_ref)
+        alpha_kla = 85 + 10 * random_state.randn(1)[0]
 
         # PAA_c
         seed_ref += 1
-        np.random.seed(seed_ref)
-        PAA_c = 530000 + 20000 * np.random.randn(1)[0]
+        random_state = np.random.RandomState(seed_ref)
+        PAA_c = 530000 + 20000 * random_state.randn(1)[0]
 
         # N_conc_paa
         seed_ref += 1
-        np.random.seed(seed_ref)
-        N_conc_paa = 150000 + 2000 * np.random.randn(1)[0]
+        random_state = np.random.RandomState(seed_ref)
+        N_conc_paa = 150000 + 2000 * random_state.randn(1)[0]
 
         # create xinterp
         self.xinterp = Xinterp(self.random_seed_ref, self.BATCH_LENGTH, self.TIME_STEP,
