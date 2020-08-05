@@ -12,13 +12,13 @@ from pensimpy.data.constants import raman_wavenumber
 from pensimpy.data.u import U
 from pensimpy.data.recipe import Recipe
 
-from pensimpy.utils.create_batch import create_batch
 from pensimpy.ode.indpensim_ode_py import indpensim_ode_py
 
-from pensimpy.utils.PIDSimple3 import PIDSimple3
-from pensimpy.utils.smooth_py import smooth_py
-from pensimpy.utils.get_dataframe import get_dataframe
-from pensimpy.utils.get_observation_data import get_observation_data
+from pensimpy.utils.utils import create_batch
+from pensimpy.utils.utils import pid_controller
+from pensimpy.utils.utils import smooth
+from pensimpy.utils.utils import get_dataframe
+from pensimpy.utils.utils import get_observation_data
 import fastodeint
 
 
@@ -452,17 +452,17 @@ class PenSimEnv:
         if ph_err >= -0.05:
             ph_on_off = 1
             if k == 1:
-                Fb = PIDSimple3(x.Fb.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.TIME_STEP)
+                Fb = pid_controller(x.Fb.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.TIME_STEP)
             else:
-                Fb = PIDSimple3(x.Fb.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.TIME_STEP)
+                Fb = pid_controller(x.Fb.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.TIME_STEP)
             Fa = 0
         elif ph_err <= -0.05:
             ph_on_off = 1
             if k == 1:
-                Fa = PIDSimple3(x.Fa.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.TIME_STEP)
+                Fa = pid_controller(x.Fa.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.TIME_STEP)
                 Fb = 0
             else:
-                Fa = PIDSimple3(x.Fa.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.TIME_STEP)
+                Fa = pid_controller(x.Fa.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.TIME_STEP)
                 Fb = x.Fb.y[k - 2] * 0.5
         else:
             ph_on_off = 0
@@ -513,18 +513,18 @@ class PenSimEnv:
         if temp_err <= 0.05:
             temp_on_off = 0
             if k == 1:
-                Fc = PIDSimple3(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.TIME_STEP)
+                Fc = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.TIME_STEP)
                 Fh = 0
             else:
-                Fc = PIDSimple3(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.TIME_STEP)
+                Fc = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.TIME_STEP)
                 Fh = x.Fh.y[k - 2] * 0.1
         else:
             temp_on_off = 1
             if k == 1:
-                Fh = PIDSimple3(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.TIME_STEP)
+                Fh = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.TIME_STEP)
                 Fc = 0
             else:
-                Fh = PIDSimple3(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.TIME_STEP)
+                Fh = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.TIME_STEP)
                 Fc = x.Fc.y[k - 2] * 0.3
         Fc = 1e-4 if Fc < 1e-4 else Fc
         Fh = 1e-4 if Fh < 1e-4 else Fh
@@ -673,9 +673,9 @@ class PenSimEnv:
                     temp2 = x.PAA_pred.y[k - 5]
 
                 if k == 1:
-                    Fpaa = PIDSimple3(x.Fpaa.y[0], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.TIME_STEP)
+                    Fpaa = pid_controller(x.Fpaa.y[0], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.TIME_STEP)
                 else:
-                    Fpaa = PIDSimple3(x.Fpaa.y[k - 2], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.TIME_STEP)
+                    Fpaa = pid_controller(x.Fpaa.y[k - 2], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.TIME_STEP)
 
         # Controller vector
         u.Fg = Fg
@@ -727,7 +727,7 @@ class PenSimEnv:
         random_noise = np.multiply(random_noise, random_number.T)[0]
 
         random_noise_summed = np.cumsum(random_noise)
-        random_noise_summed_smooth = smooth_py(random_noise_summed, 25)
+        random_noise_summed_smooth = smooth(random_noise_summed, 25)
 
         New_Spectra_noise = New_Spectra + 10 * np.array([random_noise_summed_smooth]).T
 
