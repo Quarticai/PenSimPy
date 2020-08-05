@@ -5,11 +5,11 @@ from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 
 from pensimpy.data.ctrl_flags import CtrlFlags
-from pensimpy.data.x0 import X0
-from pensimpy.data.xinterp import Xinterp
+from pensimpy.data.batch_data import X0
+from pensimpy.data.batch_data import Xinterp
 from pensimpy.data.constants import raman_spectra
 from pensimpy.data.constants import raman_wavenumber
-from pensimpy.data.u import U
+from pensimpy.data.batch_data import U
 from pensimpy.data.recipe import Recipe
 
 from pensimpy.ode.indpensim_ode_py import indpensim_ode_py

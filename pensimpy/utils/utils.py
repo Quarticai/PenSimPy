@@ -4,7 +4,7 @@ import pandas as pd
 import math
 from scipy.signal import lfilter
 from scipy.signal import savgol_filter
-from pensimpy.data.x import X
+from pensimpy.data.batch_data import X
 from pensimpy.data.channel import Channel
 
 

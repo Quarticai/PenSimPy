@@ -10,10 +10,7 @@ def indpensim_ode_py(t, yyy, par):
     :return:
     """
     mu_p = par[0]
-    # mu_p = yyy[0+33]
-
     mux_max = par[1]
-    # mux_max = yyy[1+33]
 
     ratio_mu_e_mu_b = 0.4
     P_std_dev = 0.0015
@@ -46,7 +43,6 @@ def indpensim_ode_py(t, yyy, par):
     Y_O2_P = 160
     m_O2_X = 17.5
     alpha_kla = par[2]
-    # alpha_kla = yyy[2+33]
 
     a = 0.38
     b = 0.34
@@ -86,7 +82,6 @@ def indpensim_ode_py(t, yyy, par):
     K2 = 2.5e-8
     N_conc_oil = 20000
     N_conc_paa = par[3]
-    # N_conc_paa = yyy[3+33]
 
     N_conc_shot = 400000
     Y_NX = 10
@@ -94,7 +89,6 @@ def indpensim_ode_py(t, yyy, par):
     m_N = 0.03
     X_crit_N = 150
     PAA_c = par[4]
-    # PAA_c = yyy[4+33]
 
     Y_PAA_P = 187.5
     Y_PAA_X = 45
@@ -129,42 +123,20 @@ def indpensim_ode_py(t, yyy, par):
 
     # process inputs
     inhib_flag = par[5]
-    # inhib_flag = yyy[5+33]
-
     Fs = par[6]
-    # Fs = yyy[6+33]
-
     Fg = (par[7] / 60)
-    # Fg = (yyy[7+33] / 60)
-
     RPM = par[8]
-    # RPM = yyy[8+33]
-
     Fc = par[9]
-    # Fc = yyy[9+33]
-
     Fh = par[10]
-    # Fh = yyy[10+33]
-
     Fb = par[11]
-    # Fb = yyy[11+33]
-
     Fa = par[12]
-    # Fa = yyy[12+33]
-
     step1 = par[13]
-    # step1 = yyy[13+33]
-
     Fw = par[14]
-    # Fw = yyy[14+33]
-
     Fw = 0 if Fw < 0 else Fw
     pressure = par[15]
-    # pressure = yyy[15+33]
 
     # Viscosity flag
     viscosity = yyy[9] if par[30] == 0 else par[16]
-    # viscosity = yyy[9] if yyy[30+33] == 0 else yyy[16+33]
 
     F_discharge = par[17]
     Fpaa = par[18]
@@ -179,20 +151,6 @@ def indpensim_ode_py(t, yyy, par):
     distPAA = par[27]
     distTcin = par[28]
     distO_2_in = par[29]
-
-    # F_discharge = yyy[17+33]
-    # Fpaa = yyy[18+33]
-    # Foil = yyy[19+33]
-    # NH3_shots = yyy[20+33]
-    # dist_flag = yyy[21+33]
-    # distMuP = yyy[22+33]
-    # distMuX = yyy[23+33]
-    # distsc = yyy[24+33]
-    # distcoil = yyy[25+33]
-    # distabc = yyy[26+33]
-    # distPAA = yyy[27+33]
-    # distTcin = yyy[28+33]
-    # distO_2_in = yyy[29+33]
 
     pho_b = (1100 + yyy[3] + yyy[11] + yyy[12] + yyy[13] + yyy[14])
 
@@ -526,5 +484,4 @@ def indpensim_ode_py(t, yyy, par):
             1 * N_conc_paa * Fpaa / yyy[4]) + N_conc_oil * Foil / yyy[4] - yyy[30] * dilution / yyy[4]
     dy[31] = mu_p
     dy[32] = mu_e
-    # dy.extend(yyy[33:])
     return dy
