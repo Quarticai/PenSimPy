@@ -1,11 +1,12 @@
-import sys
-sys.path.append("../..")
 from pensimpy.peni_env_setup import PenSimEnv
+from pensimpy.data.recipe import Recipe
 
 
-# Provide recipes for Fs, Foil, Fg, pres, discharge, water
-# Recipe time range: 0 < t <= 230
-setpoints_dict = {'water': [(100, 11)]}
+def run():
+    # Provide recipes for Fs, Foil, Fg, pres, discharge, water
+    # Recipe time range: 0 < t <= 230
 
-env = PenSimEnv()
-df, df_raman = env.get_batches(random_seed=1, setpoints=setpoints_dict, include_raman=False)
+    recipe = Recipe.get_default()
+    env = PenSimEnv(recipe=recipe)
+
+    return env.get_batches(random_seed=1, include_raman=False)
