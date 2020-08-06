@@ -87,69 +87,69 @@ class X:
 
 class X0:
     """
-    Initialize the batch data.
+    Initialize key features of the batch data.
     """
 
-    def __init__(self, Seed_ref, intial_conds):
-        random_state = np.random.RandomState(Seed_ref)
+    def __init__(self, random_seed_ref, intial_conds):
+        random_state = np.random.RandomState(random_seed_ref)
         self.mux = 0.41 + 0.025 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.mup = 0.041 + 0.0025 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.S = 1 + 0.1 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.DO2 = 15 + 0.5 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.X = intial_conds + 0.1 * random_state.randn(1)[0]
         self.P = 0
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.V = 5.800e+04 + 500 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.Wt = 6.2e+04 + 500 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.CO2outgas = 0.038 + 0.001 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.O2 = 0.20 + 0.05 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.pH = 6.5 + 0.1 * random_state.randn(1)[0]
         # converts from pH to H+ conc.
         self.pH = 10 ** (-self.pH)
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.T = 297 + 0.5 * random_state.randn(1)[0]
 
-        Seed_ref += 1
+        random_seed_ref += 1
         self.a0 = intial_conds * 0.3333333333333333
         self.a1 = intial_conds * 0.6666666666666666
         self.a3 = 0
         self.a4 = 0
         self.Culture_age = 0
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.PAA = 1400 + 50 * random_state.randn(1)[0]
 
-        Seed_ref += 1
-        random_state = np.random.RandomState(Seed_ref)
+        random_seed_ref += 1
+        random_state = np.random.RandomState(random_seed_ref)
         self.NH3 = 1700 + 50 * random_state.randn(1)[0]
 
 
@@ -178,15 +178,15 @@ class U:
 
 class Xinterp:
     """
-    Add disturbance to batch data.
+    Add filtered disturbance to batch data.
     """
 
-    def __init__(self, random_seed_ref, T, h, batch_time):
+    def __init__(self, random_seed_ref, batch_time):
         b1 = [0.005]
         a1 = [1, -0.995]
 
         random_state = np.random.RandomState(random_seed_ref)
-        distMuP = lfilter(b1, a1, 0.03 * random_state.randn(int(T / h + 1), 1), axis=0)
+        distMuP = lfilter(b1, a1, 0.03 * random_state.randn(NUM_STEPS + 1, 1), axis=0)
         self.distMuP = Channel(**{'name': 'Penicillin specific growth rate disturbance',
                                   'y_unit': 'g/Lh',
                                   't_unit': 'h',
@@ -194,7 +194,7 @@ class Xinterp:
                                   'value': distMuP})
 
         random_state = np.random.RandomState(random_seed_ref)
-        distMuX = lfilter(b1, a1, 0.25 * random_state.randn(int(T / h + 1), 1), axis=0)
+        distMuX = lfilter(b1, a1, 0.25 * random_state.randn(NUM_STEPS + 1, 1), axis=0)
         self.distMuX = Channel(**{'name': 'Biomass specific  growth rate disturbance',
                                   'y_unit': 'hr^{-1}',
                                   't_unit': 'h',
@@ -202,7 +202,7 @@ class Xinterp:
                                   'value': distMuX})
 
         random_state = np.random.RandomState(random_seed_ref)
-        distcs = lfilter(b1, a1, 1500 * random_state.randn(int(T / h + 1), 1), axis=0)
+        distcs = lfilter(b1, a1, 1500 * random_state.randn(NUM_STEPS + 1, 1), axis=0)
         self.distcs = Channel(**{'name': 'Substrate concentration disturbance',
                                  'y_unit': 'gL^{-1}',
                                  't_unit': 'h',
@@ -210,7 +210,7 @@ class Xinterp:
                                  'value': distcs})
 
         random_state = np.random.RandomState(random_seed_ref)
-        distcoil = lfilter(b1, a1, 300 * random_state.randn(int(T / h + 1), 1), axis=0)
+        distcoil = lfilter(b1, a1, 300 * random_state.randn(NUM_STEPS + 1, 1), axis=0)
         self.distcoil = Channel(**{'name': 'Oil inlet concentration disturbance',
                                    'y_unit': 'g L^{-1}',
                                    't_unit': 'h',
@@ -218,7 +218,7 @@ class Xinterp:
                                    'value': distcoil})
 
         random_state = np.random.RandomState(random_seed_ref)
-        distabc = lfilter(b1, a1, 0.2 * random_state.randn(int(T / h + 1), 1), axis=0)
+        distabc = lfilter(b1, a1, 0.2 * random_state.randn(NUM_STEPS + 1, 1), axis=0)
         self.distabc = Channel(**{'name': 'Acid/Base molar inlet concentration disturbance',
                                   'y_unit': 'mol L^{-1}',
                                   't_unit': 'h',
@@ -226,7 +226,7 @@ class Xinterp:
                                   'value': distabc})
 
         random_state = np.random.RandomState(random_seed_ref)
-        distPAA = lfilter(b1, a1, 300000 * random_state.randn(int(T / h + 1), 1), axis=0)
+        distPAA = lfilter(b1, a1, 300000 * random_state.randn(NUM_STEPS + 1, 1), axis=0)
         self.distPAA = Channel(**{'name': 'Phenylacetic acid concentration disturbance',
                                   'y_unit': 'g L^{-1}',
                                   't_unit': 'h',
@@ -234,7 +234,7 @@ class Xinterp:
                                   'value': distPAA})
 
         random_state = np.random.RandomState(random_seed_ref)
-        distTcin = lfilter(b1, a1, 100 * random_state.randn(int(T / h + 1), 1), axis=0)
+        distTcin = lfilter(b1, a1, 100 * random_state.randn(NUM_STEPS + 1, 1), axis=0)
         self.distTcin = Channel(**{'name': 'Coolant temperature inlet concentration disturbance',
                                    'y_unit': 'K',
                                    't_unit': 'h',
@@ -242,7 +242,7 @@ class Xinterp:
                                    'value': distTcin})
 
         random_state = np.random.RandomState(random_seed_ref)
-        distO_2in = lfilter(b1, a1, 0.02 * random_state.randn(int(T / h + 1), 1), axis=0)
+        distO_2in = lfilter(b1, a1, 0.02 * random_state.randn(NUM_STEPS + 1, 1), axis=0)
         self.distO_2in = Channel(**{'name': 'Oxygen inlet concentration',
                                     'y_unit': '%',
                                     't_unit': 'h',

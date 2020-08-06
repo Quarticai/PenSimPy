@@ -50,8 +50,7 @@ class PenSimEnv:
         N_conc_paa = 150000 + 2000 * random_state.randn(1)[0]
 
         # create xinterp
-        self.xinterp = Xinterp(self.random_seed_ref, BATCH_LENGTH_IN_HOURS, STEP_IN_HOURS,
-                               np.arange(0, BATCH_LENGTH_IN_HOURS + STEP_IN_HOURS, STEP_IN_HOURS))
+        self.xinterp = Xinterp(self.random_seed_ref, np.arange(0, BATCH_LENGTH_IN_HOURS + STEP_IN_HOURS, STEP_IN_HOURS))
 
         # param list
         # self.param_list = parameter_list(self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c)
@@ -66,7 +65,7 @@ class PenSimEnv:
 
     def step(self, k, x, Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa):
         """
-        Simulate the fermentation process by solving ODE
+        Simulate the fermentation process by solving ODE.
         """
         # simulation timing init
         h_ode = STEP_IN_HOURS / 40
@@ -390,10 +389,7 @@ class PenSimEnv:
 
     def integrate_control_strategy(self, x, k, Fs_k, Foil_k, Fg_k, pressure_k, Fremoved_k, Fw_k, Fpaa_k):
         """
-        Control strategies: Sequential batch control and PID control
-        :param x:
-        :param k:
-        :return:
+        Control strategies: Sequential batch control and PID control.
         """
         # pH controller
         u = U()
@@ -731,23 +727,17 @@ class PenSimEnv:
         # Glucose peaks
         # Peak A
         Glucose_raw_peaks_G_peaka[78: 359, 0] = 0.011398350868612364 * np.exp(-0.0004081632653061224 * np.arange(-140, 141) ** 2)
-
         # Peak B
         Glucose_raw_peaks_G_peakb[598: 679, 0] = 0.009277727451196111 * np.exp(-0.005 * np.arange(-40, 41) ** 2)
-
         # Peak C
         Glucose_raw_peaks_G_peakc[852: 1253, 0] = 0.007978845608028654 * np.exp(-0.0002 * np.arange(-200, 201) ** 2)
-
         # PAA  peaks
         # Peak A
         PAA_raw_peaks_G_peaka[298: 539, 0] = 0.01329807601338109 * np.exp(-0.0005555555555555556 * np.arange(-120, 121) ** 2)
-
         # Peak B
         PAA_raw_peaks_G_peakb[808: 869, 0] = 0.01237030326826148 * np.exp(-0.008888888888888889 * np.arange(-30, 31) ** 2)
-
         # Adding in  Peak aPen G Peak
         Product_raw_peaka[679: 920, 0] = 0.02659615202676218 * np.exp(-0.0022222222222222222 * np.arange(-120, 121) ** 2)
-
         # Adding in  Peak b for Pen G Peak
         Product_raw_peakb[299: 2100, 0] = 0.02659615202676218 * np.exp(-0.0022222222222222222 * np.arange(-900, 901) ** 2)
 
@@ -768,6 +758,9 @@ class PenSimEnv:
         return x
 
     def get_batches(self, random_seed=0, include_raman=False):
+        """
+        Generate batch data in pandas dataframes.
+        """
         self.random_seed_ref = random_seed
 
         t = time.time()

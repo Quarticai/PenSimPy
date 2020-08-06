@@ -3,8 +3,11 @@ from pensimpy.data.recipe import Recipe
 
 
 def run():
-    # Provide recipes for Fs, Foil, Fg, pres, discharge, water
-    # Recipe time range: 0 < t <= 230
+    """
+    Basic batch generation example which simulates the Sequential Batch Control.
+    :return: batch data and Raman spectra in pandas dataframe
+    """
+    # User can manually provide recipes (Fs, Foil, Fg, pres, discharge, water) instead of getting the default ones.
 
     recipe = Recipe.get_default()
     env = PenSimEnv(recipe=recipe)

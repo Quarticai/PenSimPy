@@ -1,7 +1,7 @@
 import math
 
 
-def indpensim_ode_py(t, yyy, par):
+def indpensim_ode_py(t, y, par):
     """
     ODE for penicillin proecss
     :param t: time span
@@ -136,7 +136,7 @@ def indpensim_ode_py(t, yyy, par):
     pressure = par[15]
 
     # Viscosity flag
-    viscosity = yyy[9] if par[30] == 0 else par[16]
+    viscosity = y[9] if par[30] == 0 else par[16]
 
     F_discharge = par[17]
     Fpaa = par[18]
@@ -152,7 +152,7 @@ def indpensim_ode_py(t, yyy, par):
     distTcin = par[28]
     distO_2_in = par[29]
 
-    pho_b = (1100 + yyy[3] + yyy[11] + yyy[12] + yyy[13] + yyy[14])
+    pho_b = (1100 + y[3] + y[11] + y[12] + y[13] + y[14])
 
     if dist_flag == 1:
         mu_p += distMuP
@@ -166,17 +166,17 @@ def indpensim_ode_py(t, yyy, par):
 
     # Process parameters
     # Adding in age-dependant term
-    A_t1 = (yyy[10]) / (yyy[11] + yyy[12] + yyy[13] + yyy[14])
+    A_t1 = (y[10]) / (y[11] + y[12] + y[13] + y[14])
 
     # Variables
-    s = yyy[0]
-    a_1 = yyy[12]
-    a_0 = yyy[11]
-    a_3 = yyy[13]
-    total_X = yyy[11] + yyy[12] + yyy[13] + yyy[14]  # Total Biomass
+    s = y[0]
+    a_1 = y[12]
+    a_0 = y[11]
+    a_3 = y[13]
+    total_X = y[11] + y[12] + y[13] + y[14]  # Total Biomass
 
     # Calculating liquid height in vessel
-    h_b = (yyy[4] / 1000) / (3.141592653589793 * r ** 2)
+    h_b = (y[4] / 1000) / (3.141592653589793 * r ** 2)
     h_b = h_b * (1 - epsilon)
 
     # Calculating log mean pressure of vessel
@@ -201,28 +201,28 @@ def indpensim_ode_py(t, yyy, par):
         PAA_inhib_P = 1
 
     if inhib_flag == 1:
-        pH_inhib = (1 / (1 + (yyy[6] / K1) + (K2 / yyy[6])))
+        pH_inhib = (1 / (1 + (y[6] / K1) + (K2 / y[6])))
         NH3_inhib = 1
-        T_inhib = (k_g * math.exp(-(Eg / (R * yyy[7]))) - k_d * math.exp(-(Ed / (R * yyy[7])))) * 0 + 1
+        T_inhib = (k_g * math.exp(-(Eg / (R * y[7]))) - k_d * math.exp(-(Ed / (R * y[7])))) * 0 + 1
         CO2_inhib = 1
-        DO_2_inhib_X = 0.5 * (1 - math.tanh(A_inhib * (X_crit_DO2 * ((total_pressure * O_2_in) / Henrys_c) - yyy[1])))
-        DO_2_inhib_P = 0.5 * (1 - math.tanh(A_inhib * (P_crit_DO2 * ((total_pressure * O_2_in) / Henrys_c) - yyy[1])))
+        DO_2_inhib_X = 0.5 * (1 - math.tanh(A_inhib * (X_crit_DO2 * ((total_pressure * O_2_in) / Henrys_c) - y[1])))
+        DO_2_inhib_P = 0.5 * (1 - math.tanh(A_inhib * (P_crit_DO2 * ((total_pressure * O_2_in) / Henrys_c) - y[1])))
         PAA_inhib_X = 1
         PAA_inhib_P = 1
-        pH = -math.log10(yyy[6])
-        mu_h = math.exp((B_1 + B_2 * pH + B_3 * yyy[7] + B_4 * (pH ** 2)) + B_5 * (yyy[7] ** 2))
+        pH = -math.log10(y[6])
+        mu_h = math.exp((B_1 + B_2 * pH + B_3 * y[7] + B_4 * (pH ** 2)) + B_5 * (y[7] ** 2))
 
     # if inhib_flag == 2:
-    pH_inhib = 1 / (1 + (yyy[6] / K1) + (K2 / yyy[6]))
-    NH3_inhib = 0.5 * (1 - math.tanh(A_inhib * (X_crit_N - yyy[30])))
-    T_inhib = k_g * math.exp(-(Eg / (R * yyy[7]))) - k_d * math.exp(-(Ed / (R * yyy[7])))
-    CO2_inhib = 0.5 * (1 + math.tanh(A_inhib * (X_crit_CO2 - yyy[28] * 1000)))
-    DO_2_inhib_X = 0.5 * (1 - math.tanh(A_inhib * (X_crit_DO2 * ((total_pressure * O_2_in) / Henrys_c) - yyy[1])))
-    DO_2_inhib_P = 0.5 * (1 - math.tanh(A_inhib * (P_crit_DO2 * ((total_pressure * O_2_in) / Henrys_c) - yyy[1])))
-    PAA_inhib_X = 0.5 * (1 + (math.tanh((X_crit_PAA - yyy[29]))))
-    PAA_inhib_P = 0.5 * (1 + (math.tanh((-P_crit_PAA + yyy[29]))))
-    pH = -math.log10(yyy[6])
-    mu_h = math.exp((B_1 + B_2 * pH + B_3 * yyy[7] + B_4 * (pH ** 2)) + B_5 * (yyy[7] ** 2))
+    pH_inhib = 1 / (1 + (y[6] / K1) + (K2 / y[6]))
+    NH3_inhib = 0.5 * (1 - math.tanh(A_inhib * (X_crit_N - y[30])))
+    T_inhib = k_g * math.exp(-(Eg / (R * y[7]))) - k_d * math.exp(-(Ed / (R * y[7])))
+    CO2_inhib = 0.5 * (1 + math.tanh(A_inhib * (X_crit_CO2 - y[28] * 1000)))
+    DO_2_inhib_X = 0.5 * (1 - math.tanh(A_inhib * (X_crit_DO2 * ((total_pressure * O_2_in) / Henrys_c) - y[1])))
+    DO_2_inhib_P = 0.5 * (1 - math.tanh(A_inhib * (P_crit_DO2 * ((total_pressure * O_2_in) / Henrys_c) - y[1])))
+    PAA_inhib_X = 0.5 * (1 + (math.tanh((X_crit_PAA - y[29]))))
+    PAA_inhib_P = 0.5 * (1 + (math.tanh((-P_crit_PAA + y[29]))))
+    pH = -math.log10(y[6])
+    mu_h = math.exp((B_1 + B_2 * pH + B_3 * y[7] + B_4 * (pH ** 2)) + B_5 * (y[7] ** 2))
 
     # Main rate equations for kinetic expressions
     # Penicillin inhibition curve
@@ -253,10 +253,10 @@ def indpensim_ode_py(t, yyy, par):
 
     n = 16
     phi = [0] * 10
-    phi[0] = yyy[26]
+    phi[0] = y[26]
 
     for k in range(2, 11):
-        phi[k - 1] = 4.1887902047863905 * (1.5e-4 + (k - 2) * delta_r) ** 3 * yyy[n] * delta_r
+        phi[k - 1] = 4.1887902047863905 * (1.5e-4 + (k - 2) * delta_r) ** 3 * y[n] * delta_r
         n += 1
 
     # Total vacuole volume
@@ -265,7 +265,7 @@ def indpensim_ode_py(t, yyy, par):
     v_a1 = a_1 / (2 * rho_a1) - v_2
 
     # Penicillin produced from the non-growing regions  A_1 regions
-    r_p = mu_p * rho_a0 * v_a1 * P_inhib * DO_2_inhib_P * PAA_inhib_P - mu_h * yyy[3]
+    r_p = mu_p * rho_a0 * v_a1 * P_inhib * DO_2_inhib_P * PAA_inhib_P - mu_h * y[3]
 
     # ----- Vacuole formation-------
     r_m1 = (m_s * rho_a0 * v_a1 * s) / (K_v + s)
@@ -275,27 +275,27 @@ def indpensim_ode_py(t, yyy, par):
 
     # ------ Vacuole Volume -------------------
     # n_0 - mean vacoule number density for vacuoles sized ranging from delta_0 -> r_0
-    dn0_dt = ((mu_v * v_a1) / (K_v + s)) * (1.909859317102744 * ((r_0 + delta_0) ** -3)) - k_v * yyy[15]
+    dn0_dt = ((mu_v * v_a1) / (K_v + s)) * (1.909859317102744 * ((r_0 + delta_0) ** -3)) - k_v * y[15]
 
     n = 16
     # n_j - mean vacoule number density for vacuoles sized ranging from r_{j}
-    dn1_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn1_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n += 1
-    dn2_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn2_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n += 1
-    dn3_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn3_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n += 1
-    dn4_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn4_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n += 1
-    dn5_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn5_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n += 1
-    dn6_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn6_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n += 1
-    dn7_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn7_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n += 1
-    dn8_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn8_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n += 1
-    dn9_dt = -k_v * ((yyy[n + 1] - yyy[n - 1]) / (2 * delta_r)) + D * (yyy[n + 1] - 2 * yyy[n] + yyy[n - 1]) / delta_r ** 2
+    dn9_dt = -k_v * ((y[n + 1] - y[n - 1]) / (2 * delta_r)) + D * (y[n + 1] - 2 * y[n] + y[n - 1]) / delta_r ** 2
     n_k = dn9_dt
 
     # Mean vacoule density for  department k all vacuoles above k in size are assumed constant size
@@ -303,14 +303,14 @@ def indpensim_ode_py(t, yyy, par):
     r_m = (r_0 + 10 * delta_r)
 
     # Calculating maximum vacuole volume department
-    dn_m_dt = k_v * n_k / (r_m - r_k) - mu_a * yyy[25]
-    n_k = yyy[24]
+    dn_m_dt = k_v * n_k / (r_m - r_k) - mu_a * y[25]
+    n_k = y[24]
 
     # mean vacuole
-    dphi_0_dt = ((mu_v * v_a1) / (K_v + s)) - k_v * yyy[15] * (3.141592653589793 * (r_0 + delta_0) ** 3) / 6
+    dphi_0_dt = ((mu_v * v_a1) / (K_v + s)) - k_v * y[15] * (3.141592653589793 * (r_0 + delta_0) ** 3) / 6
 
     # Volume and Weight expressions
-    F_evp = yyy[4] * alpha_evp * (math.exp(2.5 * (yyy[7] - T0) / (Tv - T0)) - 1)
+    F_evp = y[4] * alpha_evp * (math.exp(2.5 * (y[7] - T0) / (Tv - T0)) - 1)
     pho_feed = (c_s / 1000 * pho_g + (1 - c_s / 1000) * pho_w)
 
     # Dilution term
@@ -323,28 +323,28 @@ def indpensim_ode_py(t, yyy, par):
     dWt = Fs * pho_feed / 1000 + pho_oil / 1000 * Foil + Fb + Fa + Fw + F_discharge - F_evp + Fpaa * pho_paa / 1000
 
     # ODE's for Biomass regions
-    da_0_dt = r_b0 - r_d1 - yyy[11] * dilution / yyy[4]
+    da_0_dt = r_b0 - r_d1 - y[11] * dilution / y[4]
 
     # Non growing regions
-    da_1_dt = r_e1 - r_b0 + r_d1 - (3.141592653589793 * ((r_k + r_m) ** 3) / 6) * rho_d * k_v * n_k - yyy[12] * dilution / yyy[4]
+    da_1_dt = r_e1 - r_b0 + r_d1 - (3.141592653589793 * ((r_k + r_m) ** 3) / 6) * rho_d * k_v * n_k - y[12] * dilution / y[4]
 
     # Degenerated regions
-    da_3_dt = (3.141592653589793 * ((r_k + r_m) ** 3) / 6) * rho_d * k_v * n_k - r_d4 - yyy[13] * dilution / yyy[4]
+    da_3_dt = (3.141592653589793 * ((r_k + r_m) ** 3) / 6) * rho_d * k_v * n_k - r_d4 - y[13] * dilution / y[4]
 
     # Autolysed regions
-    da_4_dt = r_d4 - yyy[14] * dilution / yyy[4]
+    da_4_dt = r_d4 - y[14] * dilution / y[4]
 
     # Penicillin production
-    dP_dt = r_p - yyy[3] * dilution / yyy[4]
+    dP_dt = r_p - y[3] * dilution / y[4]
 
     # Active Biomass rate
     X_1 = da_0_dt + da_1_dt + da_3_dt + da_4_dt
 
     # Total biomass
-    X_t = yyy[11] + yyy[12] + yyy[13] + yyy[14]
+    X_t = y[11] + y[12] + y[13] + y[14]
 
-    Qrxn_X = X_1 * Y_QX * yyy[4] * Y_O2_X / 1000
-    Qrxn_P = dP_dt * Y_QX * yyy[4] * Y_O2_P / 1000
+    Qrxn_X = X_1 * Y_QX * y[4] * Y_O2_X / 1000
+    Qrxn_P = dP_dt * Y_QX * y[4] * Y_O2_P / 1000
 
     Qrxn_t = Qrxn_X + Qrxn_P
 
@@ -366,14 +366,14 @@ def indpensim_ode_py(t, yyy, par):
 
     # Substrate utilization
     dy[0] = -r_se1 - r_sb0 - r_m0 - r_m1 - (
-            Y_sP * mu_p * rho_a0 * v_a1 * P_inhib * DO_2_inhib_P * PAA_inhib_P) + Fs * c_s / yyy[4] + Foil * c_oil / \
-            yyy[4] - yyy[0] * dilution / yyy[4]
+            Y_sP * mu_p * rho_a0 * v_a1 * P_inhib * DO_2_inhib_P * PAA_inhib_P) + Fs * c_s / y[4] + Foil * c_oil / \
+            y[4] - y[0] * dilution / y[4]
 
     # Dissolved oxygen
     V_s = Fg / (3.141592653589793 * r ** 2)
-    T = yyy[7]
-    V = yyy[4]
-    V_m = yyy[4] / 1000
+    T = y[7]
+    V = y[4]
+    V_m = y[4] / 1000
     P_air = ((V_s * R * T * V_m / (22.4 * h_b)) * math.log(1 + pho_b * 9.81 * h_b / (pressure_top * 1e5)))
     P_t1 = (variable_power + P_air)
     viscosity = 1 if viscosity <= 4 else viscosity
@@ -381,17 +381,17 @@ def indpensim_ode_py(t, yyy, par):
     oil_f = Foil / V
     kla = alpha_kla * ((V_s ** a) * ((P_t1 / V_m) ** b) * vis_scaled ** c) * (1 - oil_f ** d)
     OUR = -X_1 * Y_O2_X - m_O2_X * X_t - dP_dt * Y_O2_P
-    OTR = kla * (DOstar_tp - yyy[1])
-    dy[1] = OUR + OTR - (yyy[1] * dilution / yyy[4])
+    OTR = kla * (DOstar_tp - y[1])
+    dy[1] = OUR + OTR - (y[1] * dilution / y[4])
 
     # O_2 off-gas
     Vg = epsilon * V_m
     Qfg_in = 85714.28571428572 * Fg
-    Qfg_out = Fg * (N2_in / (1 - yyy[2] - yyy[27] / 100)) * 85714.28571428572
-    dy[2] = (Qfg_in * O_2_in - Qfg_out * yyy[2] - 0.06 * OTR * V_m) / (Vg * 1293.3035714285716)
+    Qfg_out = Fg * (N2_in / (1 - y[2] - y[27] / 100)) * 85714.28571428572
+    dy[2] = (Qfg_in * O_2_in - Qfg_out * y[2] - 0.06 * OTR * V_m) / (Vg * 1293.3035714285716)
 
     # Penicillin production rate
-    dy[3] = r_p - yyy[3] * dilution / yyy[4]
+    dy[3] = r_p - y[3] * dilution / y[4]
 
     # Volume change
     dy[4] = dV1
@@ -401,37 +401,37 @@ def indpensim_ode_py(t, yyy, par):
 
     # pH
     pH_dis = Fs + Foil + Fb + Fa + F_discharge + Fw
-    if -math.log10(yyy[6]) < 7:
+    if -math.log10(y[6]) < 7:
         cb = -abc
         ca = abc
         pH_balance = 0
     else:
         cb = abc
         ca = -abc
-        yyy[6] = (1e-14 / yyy[6] - yyy[6])
+        y[6] = (1e-14 / y[6] - y[6])
         pH_balance = 1
 
     # Calculation of ion addition
-    B = -(yyy[6] * yyy[4] + ca * Fa * step1 + cb * Fb * step1) / (yyy[4] + Fb * step1 + Fa * step1)
+    B = -(y[6] * y[4] + ca * Fa * step1 + cb * Fb * step1) / (y[4] + Fb * step1 + Fa * step1)
 
     if pH_balance == 1:
         dy[6] = -gamma1 * (r_b0 + r_e1 + r_d4 + r_d1 + m_ph * total_X) - gamma1 * r_p - gamma2 * pH_dis + (
-                (-B - (B ** 2 + 4e-14)**.5) / 2 - yyy[6])
+                (-B - (B ** 2 + 4e-14)**.5) / 2 - y[6])
 
     if pH_balance == 0:
         dy[6] = gamma1 * (r_b0 + r_e1 + r_d4 + r_d1 + m_ph * total_X) + gamma1 * r_p + gamma2 * pH_dis + (
-                (-B + (B ** 2 + 4e-14)**.5) / 2 - yyy[6])
+                (-B + (B ** 2 + 4e-14)**.5) / 2 - y[6])
 
     # Temperature
     Ws = P_t1
-    Qcon = U_jacket * A_c * (yyy[7] - Tair)
-    dQ_dt = Fs * pho_feed * C_ps * (Tf - yyy[7]) / 1000 + Fw * pho_w * C_pw * (
-            Tw - yyy[7]) / 1000 - F_evp * pho_b * C_pw / 1000 - dealta_H_evap * F_evp * pho_w / 1000 + Qrxn_t + Ws - (
+    Qcon = U_jacket * A_c * (y[7] - Tair)
+    dQ_dt = Fs * pho_feed * C_ps * (Tf - y[7]) / 1000 + Fw * pho_w * C_pw * (
+            Tw - y[7]) / 1000 - F_evp * pho_b * C_pw / 1000 - dealta_H_evap * F_evp * pho_w / 1000 + Qrxn_t + Ws - (
                     alpha_1 / 1000) * Fc ** (beta_T + 1) * (
-                    (yyy[7] - Tcin) / (Fc / 1000 + (alpha_1 * (Fc / 1000) ** beta_T) / 2 * pho_b * C_ps)) - (
+                    (y[7] - Tcin) / (Fc / 1000 + (alpha_1 * (Fc / 1000) ** beta_T) / 2 * pho_b * C_ps)) - (
                     alpha_1 / 1000) * Fh ** (beta_T + 1) * (
-                    (yyy[7] - Th) / (Fh / 1000 + (alpha_1 * (Fh / 1000) ** beta_T) / 2 * pho_b * C_ps)) - Qcon
-    dy[7] = dQ_dt / ((yyy[4] / 1000) * C_pw * pho_b)
+                    (y[7] - Th) / (Fh / 1000 + (alpha_1 * (Fh / 1000) ** beta_T) / 2 * pho_b * C_ps)) - Qcon
+    dy[7] = dQ_dt / ((y[4] / 1000) * C_pw * pho_b)
 
     # Heat generation
     dy[8] = dQ_dt
@@ -440,7 +440,7 @@ def indpensim_ode_py(t, yyy, par):
     dy[9] = 3 * (a_0 ** (1 / 3)) * (1 / (1 + math.exp(-k1 * (t - t1)))) * (1 / (1 + math.exp(-k2 * (t - t2)))) - k3 * Fw
 
     # Total X
-    dy[10] = yyy[11] + yyy[12] + yyy[13] + yyy[14]
+    dy[10] = y[11] + y[12] + y[13] + y[14]
 
     #
     #   Adding in the ODE's for hyphae
@@ -463,22 +463,22 @@ def indpensim_ode_py(t, yyy, par):
     dy[26] = dphi_0_dt
 
     # CO_2
-    total_X_CO2 = yyy[11] + yyy[12]
+    total_X_CO2 = y[11] + y[12]
     CER = total_X_CO2 * q_co2 * V
-    dy[27] = (117857.14285714287 * Fg * C_CO2_in + CER - 117857.14285714287 * Fg * yyy[27]) / (Vg * 1293.3035714285716)
+    dy[27] = (117857.14285714287 * Fg * C_CO2_in + CER - 117857.14285714287 * Fg * y[27]) / (Vg * 1293.3035714285716)
 
     # dissolved CO_2
-    Henrys_c_co2 = (math.exp(11.25 - 395.9 / (yyy[7] - 175.9))) / 4400
-    C_star_CO2 = (total_pressure * yyy[27]) / Henrys_c_co2
-    dy[28] = kla * delta_c_0 * (C_star_CO2 - yyy[28]) - yyy[28] * dilution / yyy[4]
+    Henrys_c_co2 = (math.exp(11.25 - 395.9 / (y[7] - 175.9))) / 4400
+    C_star_CO2 = (total_pressure * y[27]) / Henrys_c_co2
+    dy[28] = kla * delta_c_0 * (C_star_CO2 - y[28]) - y[28] * dilution / y[4]
 
     # PAA
-    dy[29] = Fpaa * PAA_c / V - Y_PAA_P * dP_dt - Y_PAA_X * X_1 - m_PAA * yyy[3] - yyy[29] * dilution / yyy[4]
+    dy[29] = Fpaa * PAA_c / V - Y_PAA_P * dP_dt - Y_PAA_X * X_1 - m_PAA * y[3] - y[29] * dilution / y[4]
 
     # N
     X_C_nitrogen = (-r_b0 - r_e1 - r_d1 - r_d4) * Y_NX
     P_C_nitrogen = -dP_dt * Y_NP
-    dy[30] = (NH3_shots * N_conc_shot) / yyy[4] + X_C_nitrogen + P_C_nitrogen - m_N * total_X + (1 * N_conc_paa * Fpaa / yyy[4]) + N_conc_oil * Foil / yyy[4] - yyy[30] * dilution / yyy[4]
+    dy[30] = (NH3_shots * N_conc_shot) / y[4] + X_C_nitrogen + P_C_nitrogen - m_N * total_X + (1 * N_conc_paa * Fpaa / y[4]) + N_conc_oil * Foil / y[4] - y[30] * dilution / y[4]
     dy[31] = mu_p
     dy[32] = mu_e
     return dy
