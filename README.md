@@ -22,6 +22,6 @@ pip install pensimpy
 Examples
 ============
 See the `examples` directory
-- run [examples/batch_generation_example.py](pensimpy/examples/batch_generation_example.py) to generate
+- run [examples/batch_generation.py](pensimpy/examples/batch_generation.py) to generate
 batch and Raman data with self-designed recipes
 
