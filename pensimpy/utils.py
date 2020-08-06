@@ -4,17 +4,17 @@ import math
 from scipy.signal import lfilter
 from pensimpy.data.batch_data import X
 from pensimpy.data.channel import Channel
+from pensimpy.data.constants import NUM_STEPS
+from pensimpy.data.constants import WAVENUMBER_LENGTH
+from pensimpy.data.constants import STEP_IN_HOURS
 
 
-def create_batch(h, T):
+def create_batch():
     """
     Create the batch data
-    :param h:
-    :param T:
-    :return:
     """
-    t = np.zeros((int(T / h), 1), dtype=float)
-    y = np.zeros((int(T / h), 1), dtype=float)
+    t = np.zeros((NUM_STEPS, 1), dtype=float)
+    y = np.zeros((NUM_STEPS, 1), dtype=float)
 
     x = X()
     # pensim manipulated variables
@@ -91,8 +91,8 @@ def create_batch(h, T):
     x.PAA_pred = Channel(**{'name': 'PAA Prediction.', 'y_unit': 'PAA_pred (g L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
 
     # Raman Spectra: Wavenumber & Intensity
-    Wavenumber = np.zeros((2200, 1), dtype=float)
-    Intensity = np.zeros((int(T / h), 2200), dtype=float)
+    Wavenumber = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
+    Intensity = np.zeros((NUM_STEPS, WAVENUMBER_LENGTH), dtype=float)
     x.Raman_Spec = Channel(**{'name': 'Raman Spectra', 'y_unit': 'a.u', 't_unit': 'cm^-1', 'Wavenumber': Wavenumber, 'Intensity': Intensity})
 
     return x
@@ -169,14 +169,14 @@ def get_dataframe(batch_data, include_raman):
                             "Vessel Weight": batch_data.Wt.y,
                             "Dissolved oxygen concentration": batch_data.DO2.y,
                             "Oxygen in percent in off-gas": batch_data.O2.y, })
-    df = df.set_index([[t * 0.2 for t in range(1, 1151)]])
+    df = df.set_index([[t * STEP_IN_HOURS for t in range(1, NUM_STEPS + 1)]])
 
     df_raman = pd.DataFrame()
     if include_raman:
         wavenumber = batch_data.Raman_Spec.Wavenumber
         df_raman = pd.DataFrame(batch_data.Raman_Spec.Intensity, columns=wavenumber)
         df_raman = df_raman[df_raman.columns[::-1]]
-        df_raman = df_raman.set_index([[t * 0.2 for t in range(1, 1151)]])
+        df_raman = df_raman.set_index([[t * STEP_IN_HOURS for t in range(1, NUM_STEPS + 1)]])
         return df, df_raman
 
     return df, df_raman

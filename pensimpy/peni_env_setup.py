@@ -7,9 +7,15 @@ from scipy.interpolate import interp1d
 from pensimpy.data.ctrl_flags import CtrlFlags
 from pensimpy.data.batch_data import X0
 from pensimpy.data.batch_data import Xinterp
-from pensimpy.data.constants import raman_spectra
-from pensimpy.data.constants import raman_wavenumber
 from pensimpy.data.batch_data import U
+
+from pensimpy.data.constants import RAMAN_SPECTRA
+from pensimpy.data.constants import RAMAN_WAVENUMBER
+from pensimpy.data.constants import STEP_IN_MINUTES
+from pensimpy.data.constants import BATCH_LENGTH_IN_HOURS
+from pensimpy.data.constants import STEP_IN_HOURS
+from pensimpy.data.constants import NUM_STEPS
+from pensimpy.data.constants import WAVENUMBER_LENGTH
 
 from pensimpy.ode.indpensim_ode_py import indpensim_ode_py
 
@@ -22,10 +28,6 @@ import fastodeint
 
 
 class PenSimEnv:
-    MINS_PER_TIME_STEP = 12  # minutes
-    TIME_STEP = 0.2  # [hour]
-    BATCH_LENGTH = 230  # [hour]
-
     def __init__(self, recipe, fast=True):
         self.xinterp = None
         self.x0 = None
@@ -64,15 +66,15 @@ class PenSimEnv:
         N_conc_paa = 150000 + 2000 * random_state.randn(1)[0]
 
         # create xinterp
-        self.xinterp = Xinterp(self.random_seed_ref, self.BATCH_LENGTH, self.TIME_STEP,
-                               np.arange(0, self.BATCH_LENGTH + self.TIME_STEP, self.TIME_STEP))
+        self.xinterp = Xinterp(self.random_seed_ref, BATCH_LENGTH_IN_HOURS, STEP_IN_HOURS,
+                               np.arange(0, BATCH_LENGTH_IN_HOURS + STEP_IN_HOURS, STEP_IN_HOURS))
 
         # param list
         # self.param_list = parameter_list(self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c)
         self.param_list = [self.x0.mup, self.x0.mux, alpha_kla, N_conc_paa, PAA_c]
 
         # create the observation class
-        x = create_batch(self.TIME_STEP, self.BATCH_LENGTH)
+        x = create_batch()
 
         # get observation
         observation = get_observation_data(x, 0)
@@ -83,8 +85,8 @@ class PenSimEnv:
         Simulate the fermentation process by solving ODE
         """
         # simulation timing init
-        h_ode = self.TIME_STEP / 40
-        t = np.arange(0, self.BATCH_LENGTH + self.TIME_STEP, self.TIME_STEP)
+        h_ode = STEP_IN_HOURS / 40
+        t = np.arange(0, BATCH_LENGTH_IN_HOURS + STEP_IN_HOURS, STEP_IN_HOURS)
 
         # fills the batch with just the initial conditions so the control system
         # can provide the first input. These will be overwritten after
@@ -357,7 +359,7 @@ class PenSimEnv:
                 x = self.raman_sim(k, x)
 
         # Off-line measurements recorded
-        if np.remainder(t_tmp, self.ctrl_flags.Off_line_m) == 0 or t_tmp == 1 or t_tmp == self.BATCH_LENGTH:
+        if np.remainder(t_tmp, self.ctrl_flags.Off_line_m) == 0 or t_tmp == 1 or t_tmp == BATCH_LENGTH_IN_HOURS:
             delay = self.ctrl_flags.Off_line_delay
             x.NH3_offline.y[k - 1] = x.NH3.y[k - delay - 1]
             x.NH3_offline.t[k - 1] = x.NH3.t[k - delay - 1]
@@ -387,18 +389,18 @@ class PenSimEnv:
         # peni_yield is accumulated penicillin
         # yield_pre is previous yield
         # x.Fremoved.y[k - 1] * x.P.y[k - 1] * h / 1000  is the discharged
-        yield_per_run = peni_yield - self.yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * self.TIME_STEP / 1000
+        yield_per_run = peni_yield - self.yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * STEP_IN_HOURS / 1000
         self.yield_pre = peni_yield
 
         observation = get_observation_data(x, k - 1)
 
-        done = True if k == self.BATCH_LENGTH / self.TIME_STEP else False
+        done = True if k == NUM_STEPS else False
         if done:
             # post process
             # convert to pH from H+ concentration
             x.pH.y = [-math.log(pH) / math.log(10) if pH != 0 else pH for pH in x.pH.y]
             x.Q.y = [Q / 1000 for Q in x.Q.y]
-            x.Raman_Spec.Wavenumber = raman_wavenumber
+            x.Raman_Spec.Wavenumber = RAMAN_WAVENUMBER
 
         return observation, x, yield_per_run, done
 
@@ -453,17 +455,17 @@ class PenSimEnv:
         if ph_err >= -0.05:
             ph_on_off = 1
             if k == 1:
-                Fb = pid_controller(x.Fb.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.TIME_STEP)
+                Fb = pid_controller(x.Fb.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, STEP_IN_HOURS)
             else:
-                Fb = pid_controller(x.Fb.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, self.TIME_STEP)
+                Fb = pid_controller(x.Fb.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, STEP_IN_HOURS)
             Fa = 0
         elif ph_err <= -0.05:
             ph_on_off = 1
             if k == 1:
-                Fa = pid_controller(x.Fa.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.TIME_STEP)
+                Fa = pid_controller(x.Fa.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, STEP_IN_HOURS)
                 Fb = 0
             else:
-                Fa = pid_controller(x.Fa.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, self.TIME_STEP)
+                Fa = pid_controller(x.Fa.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, STEP_IN_HOURS)
                 Fb = x.Fb.y[k - 2] * 0.5
         else:
             ph_on_off = 0
@@ -514,18 +516,18 @@ class PenSimEnv:
         if temp_err <= 0.05:
             temp_on_off = 0
             if k == 1:
-                Fc = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.TIME_STEP)
+                Fc = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, STEP_IN_HOURS)
                 Fh = 0
             else:
-                Fc = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, self.TIME_STEP)
+                Fc = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, STEP_IN_HOURS)
                 Fh = x.Fh.y[k - 2] * 0.1
         else:
             temp_on_off = 1
             if k == 1:
-                Fh = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.TIME_STEP)
+                Fh = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, STEP_IN_HOURS)
                 Fc = 0
             else:
-                Fh = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, self.TIME_STEP)
+                Fh = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, STEP_IN_HOURS)
                 Fc = x.Fc.y[k - 2] * 0.3
         Fc = 1e-4 if Fc < 1e-4 else Fc
         Fh = 1e-4 if Fh < 1e-4 else Fh
@@ -659,7 +661,7 @@ class PenSimEnv:
                 PAA_err1 = PAA_sp - x.PAA.y[k - 3]
 
             # builds the temperature history of current and previous two samples
-            if k * self.TIME_STEP >= 10:
+            if k * STEP_IN_HOURS >= 10:
                 if k == 1 or k == 2:
                     temp = x.PAA_pred.y[0]
                     temp1 = x.PAA_pred.y[0]
@@ -674,9 +676,9 @@ class PenSimEnv:
                     temp2 = x.PAA_pred.y[k - 5]
 
                 if k == 1:
-                    Fpaa = pid_controller(x.Fpaa.y[0], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.TIME_STEP)
+                    Fpaa = pid_controller(x.Fpaa.y[0], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, STEP_IN_HOURS)
                 else:
-                    Fpaa = pid_controller(x.Fpaa.y[k - 2], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, self.TIME_STEP)
+                    Fpaa = pid_controller(x.Fpaa.y[k - 2], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, STEP_IN_HOURS)
 
         # Controller vector
         u.Fg = Fg
@@ -700,10 +702,9 @@ class PenSimEnv:
 
     def raman_sim(self, k, x):
         # Building history of Raman Spectra
-        Wavenumber_max = 2200
-        Intensity_shift1 = np.ones((Wavenumber_max, 1), dtype=int)
+        Intensity_shift1 = np.ones((WAVENUMBER_LENGTH, 1), dtype=int)
 
-        Intensity_shift1[:, 0] = np.exp((np.arange(Wavenumber_max) + 1) / 1100) - 0.5
+        Intensity_shift1[:, 0] = np.exp((np.arange(WAVENUMBER_LENGTH) + 1) / 1100) - 0.5
 
         a = -0.000178143846614472
         b = 1.05644816081515
@@ -712,7 +713,7 @@ class PenSimEnv:
         Product_S = x.P.y[k - 1] / 40
         Biomass_S = x.X.y[k - 1] / 40
         Viscosity_S = x.Viscosity.y[k - 1] / 100
-        Time_S = k / (self.BATCH_LENGTH / self.TIME_STEP)
+        Time_S = k / NUM_STEPS
         Intensity_increase1 = a * Biomass_S + b * Product_S + c * Viscosity_S + d * Time_S
         scaling_factor = 370000
         Gluc_increase = 1714.2857142857142
@@ -720,11 +721,11 @@ class PenSimEnv:
         Prod_increase = 100000
 
         # Loading in the reference Raman Spectral file
-        New_Spectra = Intensity_increase1 * scaling_factor * Intensity_shift1 + np.array([raman_spectra]).T
+        New_Spectra = Intensity_increase1 * scaling_factor * Intensity_shift1 + np.array([RAMAN_SPECTRA]).T
         x.Raman_Spec.Intensity[k - 1, :] = np.squeeze(New_Spectra).tolist()
 
-        random_noise = [50] * Wavenumber_max
-        random_number = np.random.randint(-1, 2, size=(Wavenumber_max, 1))
+        random_noise = [50] * WAVENUMBER_LENGTH
+        random_number = np.random.randint(-1, 2, size=(WAVENUMBER_LENGTH, 1))
         random_noise = np.multiply(random_noise, random_number.T)[0]
 
         random_noise_summed = np.cumsum(random_noise)
@@ -735,13 +736,13 @@ class PenSimEnv:
         x.Raman_Spec.Intensity[k - 1, :] = np.squeeze(New_Spectra_noise).tolist()
 
         # Aim 3. Creating the bell curve response for Glucose
-        Glucose_raw_peaks_G_peaka = np.zeros((Wavenumber_max, 1), dtype=float)
-        Glucose_raw_peaks_G_peakb = np.zeros((Wavenumber_max, 1), dtype=float)
-        Glucose_raw_peaks_G_peakc = np.zeros((Wavenumber_max, 1), dtype=float)
-        PAA_raw_peaks_G_peaka = np.zeros((Wavenumber_max, 1), dtype=float)
-        PAA_raw_peaks_G_peakb = np.zeros((Wavenumber_max, 1), dtype=float)
-        Product_raw_peaka = np.zeros((Wavenumber_max, 1), dtype=float)
-        Product_raw_peakb = np.zeros((Wavenumber_max, 1), dtype=float)
+        Glucose_raw_peaks_G_peaka = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
+        Glucose_raw_peaks_G_peakb = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
+        Glucose_raw_peaks_G_peakc = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
+        PAA_raw_peaks_G_peaka = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
+        PAA_raw_peaks_G_peakb = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
+        Product_raw_peaka = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
+        Product_raw_peakb = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
 
         # Glucose peaks
         # Peak A
@@ -794,7 +795,7 @@ class PenSimEnv:
         while not done:
             k_timestep += 1
             # Get action from recipe agent based on time
-            Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = self.recipe.get_values_at(k_timestep * self.MINS_PER_TIME_STEP)
+            Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = self.recipe.get_values_at(k_timestep * STEP_IN_MINUTES)
 
             # Run and get the reward
             # observation is a class which contains all the variables, e.g. observation.Fs.y[k], observation.Fs.t[k]

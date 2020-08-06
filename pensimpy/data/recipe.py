@@ -1,17 +1,16 @@
 from collections import OrderedDict
 from itertools import chain
+from pensimpy.data.constants import MINUTES_PER_HOUR
 
 
 class Setpoint:
-    MINUTES_PER_HOUR = 60
-
     UOT_HOUR = "hour"
     UOT_MINUTE = "minute"
 
     def __init__(self, time_until, value, unit_of_time=UOT_HOUR):
         assert unit_of_time in {self.UOT_HOUR, self.UOT_MINUTE}, "Unknown unit of time"
         if unit_of_time == self.UOT_HOUR:
-            assert (time_until * self.MINUTES_PER_HOUR) % 1 == 0, (f"{time_until} {self.UOT_HOUR}s is invalid. "
+            assert (time_until * MINUTES_PER_HOUR) % 1 == 0, (f"{time_until} {self.UOT_HOUR}s is invalid. "
                                                                    f"The given time must be a multiple of 1 minute"
                                                                    " after being converted from hours")
         self._time_until = time_until
@@ -22,7 +21,7 @@ class Setpoint:
         if self.unit_of_time == self.UOT_MINUTE:
             return self._time_until
         else:
-            return int(self._time_until * self.MINUTES_PER_HOUR)
+            return int(self._time_until * MINUTES_PER_HOUR)
 
     @property
     def time(self):

@@ -1,5 +1,6 @@
 import numpy as np
 from pensimpy.data.channel import Channel
+from pensimpy.data.constants import NUM_STEPS
 from scipy.signal import lfilter
 
 
@@ -73,7 +74,7 @@ class X:
         self.PAT_ref = ''
         self.Batch_ref = ''
         # extra
-        self.PRBS_noise_addition = [0] * 1750
+        self.PRBS_noise_addition = [0] * NUM_STEPS
 
 
 class X0:
@@ -243,4 +244,4 @@ class Xinterp:
         # extra
         self.NH3_shots = Channel()
         # hard code
-        self.NH3_shots.y = [0] * 2000
+        self.NH3_shots.y = [0] * NUM_STEPS
