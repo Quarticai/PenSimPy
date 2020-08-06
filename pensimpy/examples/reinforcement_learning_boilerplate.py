@@ -1,8 +1,21 @@
 import time
+import random
+import numpy as np
 from pensimpy.data.recipe import Recipe
 from pensimpy.peni_env_setup import PenSimEnv
 from pensimpy.data.constants import STEP_IN_MINUTES
-from .agent import Agent
+
+
+class Agent:
+    """
+    This is a simple agent samples random actions.
+    """
+
+    def __init__(self, act_dim):
+        self.act_dim = act_dim
+
+    def sample_actions(self):
+        return np.clip([random.uniform(-1.5, 1.5) for _ in range(self.act_dim)], -0.01, 0.01)
 
 
 def run(episodes=1000):

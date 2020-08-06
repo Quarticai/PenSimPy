@@ -22,8 +22,8 @@ pip install pensimpy
 Examples
 ============
 See the `examples` directory
-- run [examples/batch_generation/example.py](pensimpy/examples/batch_generation/example.py) to generate
+- run [examples/batch_generation.py](pensimpy/examples/batch_generation.py) to generate
 batch and Raman data with self-designed recipes
-- run [examples/reinforcement_learning_boilerplate/example.py](pensimpy/examples/reinforcement_learning_boilerplate/example.py) to 
+- run [examples/reinforcement_learning_boilerplate.py](pensimpy/examples/reinforcement_learning_boilerplate.py) to 
 simulate penicillin yield process with reinforcement learning
 
