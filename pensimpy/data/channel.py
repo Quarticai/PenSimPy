@@ -1,6 +1,6 @@
 class Channel:
     """
-    Class attributes for each var in batch data
+    Class attributes for each var in batch data.
     """
 
     def __init__(self, **kwargs):

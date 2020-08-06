@@ -4,6 +4,9 @@ from pensimpy.data.constants import MINUTES_PER_HOUR
 
 
 class Setpoint:
+    """
+    Class for defining the setpoint which contributes process variables.
+    """
     UOT_HOUR = "hour"
     UOT_MINUTE = "minute"
 
@@ -40,6 +43,10 @@ class Setpoint:
 
 
 class ProcessVariable:
+    """
+    Process variables feed the simulation and realize the Sequential Batch Control. And it support adding new setpoints
+    and modifying current setpoints.
+    """
     class Decorator:
         @staticmethod
         def populate_setpoint_value_lookup(func):
@@ -134,6 +141,9 @@ class PIDControlledProcessVariable(ProcessVariable):
 
 
 class Recipe:
+    """
+    Recipe class for getting the default recipes and manually updating setpoints in recipe.
+    """
     FS = "Fs"
     FOIL = "Foil"
     FG = "Fg"

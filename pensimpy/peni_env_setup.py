@@ -12,6 +12,10 @@ import fastodeint
 
 
 class PenSimEnv:
+    """
+    Class for setting up the simulation environment, simulating the penicillin yield process with Raman spectra, and
+    generating the batch data and Raman spectra data in pandas dataframe.
+    """
     def __init__(self, recipe, fast=True):
         self.xinterp = None
         self.x0 = None
