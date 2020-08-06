@@ -10,7 +10,6 @@ from pensimpy.data.batch_data import Xinterp
 from pensimpy.data.constants import raman_spectra
 from pensimpy.data.constants import raman_wavenumber
 from pensimpy.data.batch_data import U
-from pensimpy.data.recipe import Recipe
 
 from pensimpy.ode.indpensim_ode_py import indpensim_ode_py
 
@@ -23,10 +22,11 @@ import fastodeint
 
 
 class PenSimEnv:
+    MINS_PER_TIME_STEP = 12  # minutes
     TIME_STEP = 0.2  # [hour]
     BATCH_LENGTH = 230  # [hour]
 
-    def __init__(self, fast=True):
+    def __init__(self, recipe, fast=True):
         self.xinterp = None
         self.x0 = None
         self.param_list = None
@@ -34,6 +34,7 @@ class PenSimEnv:
         self.yield_pre = 0
         self.random_seed_ref = 0
         self.fast = fast
+        self.recipe = recipe
 
     def reset(self):
         """
@@ -781,27 +782,24 @@ class PenSimEnv:
 
         return x
 
-    def get_batches(self, random_seed=0, setpoints=None, include_raman=False):
+    def get_batches(self, random_seed=0, include_raman=False):
         self.random_seed_ref = random_seed
 
         t = time.time()
         done = False
         observation, batch_data = self.reset()
-        recipe = Recipe(setpoints)
+        k_timestep, batch_yield, yield_pre = 0, 0, 0
 
-        time_stamp, batch_yield, yield_pre = 0, 0, 0
         self.yield_pre = 0
         while not done:
-            # time is from 1 to 1150
-            time_stamp += 1
-
+            k_timestep += 1
             # Get action from recipe agent based on time
-            Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = recipe.run(time_stamp)
+            Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = self.recipe.get_values_at(k_timestep * self.MINS_PER_TIME_STEP)
 
             # Run and get the reward
             # observation is a class which contains all the variables, e.g. observation.Fs.y[k], observation.Fs.t[k]
             # are the Fs value and corresponding time at k
-            observation, batch_data, reward, done = self.step(time_stamp,
+            observation, batch_data, reward, done = self.step(k_timestep,
                                                               batch_data,
                                                               Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
             batch_yield += reward
