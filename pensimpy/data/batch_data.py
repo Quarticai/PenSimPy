@@ -1,6 +1,6 @@
 import numpy as np
 from pensimpy.data.channel import Channel
-from pensimpy.data.constants import NUM_STEPS
+from pensimpy.data.constants import NUM_STEPS, WAVENUMBER_LENGTH
 from scipy.signal import lfilter
 
 
@@ -10,71 +10,79 @@ class X:
     """
 
     def __init__(self):
-        self.Fg = ''
-        self.RPM = ''
-        self.Fs = ''
-        self.sc = ''
-        self.abc = ''
-        self.Fa = ''
-        self.Fb = ''
-        self.Fc = ''
-        self.Fh = ''
-        self.Fw = ''
-        self.pressure = ''
-        self.Fremoved = ''
-        self.S = ''
-        self.DO2 = ''
-        self.X = ''
-        self.P = ''
-        self.V = ''
-        self.Wt = ''
-        self.pH = ''
-        self.T = ''
-        self.Q = ''
-        self.a0 = ''
-        self.a1 = ''
-        self.a3 = ''
-        self.a4 = ''
-        self.n0 = ''
-        self.n1 = ''
-        self.n2 = ''
-        self.n3 = ''
-        self.n4 = ''
-        self.n5 = ''
-        self.n6 = ''
-        self.n7 = ''
-        self.n8 = ''
-        self.n9 = ''
-        self.nm = ''
-        self.phi0 = ''
-        self.CO2outgas = ''
-        self.Culture_age = ''
-        self.Fpaa = ''
-        self.PAA = ''
-        self.PAA_offline = ''
-        self.NH3 = ''
-        self.NH3_offline = ''
-        self.OUR = ''
-        self.O2 = ''
-        self.mup = ''
-        self.mux = ''
-        self.P_offline = ''
-        self.X_CER = ''
-        self.X_offline = ''
-        self.CER = ''
-        self.mu_X_calc = ''
-        self.mu_P_calc = ''
-        self.F_discharge_cal = ''
-        self.NH3_shots = ''
-        self.CO2_d = ''
-        self.Viscosity = ''
-        self.Viscosity_offline = ''
-        self.Fault_ref = ''
-        self.Control_ref = ''
-        self.PAT_ref = ''
-        self.Batch_ref = ''
+        t = np.zeros((NUM_STEPS, 1), dtype=float)
+        y = np.zeros((NUM_STEPS, 1), dtype=float)
+        self.Fg = Channel(**{'name': 'Aeration rate', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.RPM = Channel(**{'name': 'Agitator RPM', 'y_unit': 'RPM', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fs = Channel(**{'name': 'Sugar feed rate', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.sc = Channel(**{'name': 'Substrate feed concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.abc = Channel(**{'name': 'Acid/base feed concen.', 'y_unit': 'moles', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fa = Channel(**{'name': 'Acid flow rate', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fb = Channel(**{'name': 'Base flow rate', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fc = Channel(**{'name': 'Heating/cooling water flowrate', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fh = Channel(**{'name': 'Heating water flowrate', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fw = Channel(**{'name': 'Water for injection/dilution', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.pressure = Channel(**{'name': 'Air head pressure', 'y_unit': 'bar', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fremoved = Channel(**{'name': 'Dumped broth flow', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.S = Channel(**{'name': 'Substrate concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.DO2 = Channel(**{'name': 'Dissolved oxygen concen.', 'y_unit': 'mg/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.X = Channel(**{'name': 'Biomass concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.P = Channel(**{'name': 'Penicillin concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.V = Channel(**{'name': 'Vessel Volume', 'y_unit': 'L', 't_unit': 'h', 'time': t, 'value': y})
+        self.Wt = Channel(**{'name': 'Vessel Weight', 'y_unit': 'Kg', 't_unit': 'h', 'time': t, 'value': y})
+        self.pH = Channel(**{'name': 'pH', 'y_unit': 'pH', 't_unit': 'h', 'time': t, 'value': y})
+        self.T = Channel(**{'name': 'Temperature', 'y_unit': 'K', 't_unit': 'h', 'time': t, 'value': y})
+        self.Q = Channel(**{'name': 'Generated heat', 'y_unit': 'kJ', 't_unit': 'h', 'time': t, 'value': y})
+        self.a0 = Channel(**{'name': 'type a0 biomass concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.a1 = Channel(**{'name': 'type a1 biomass concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.a3 = Channel(**{'name': 'type a3 biomass concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.a4 = Channel(**{'name': 'type a4 biomass concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
+        self.n0 = Channel(**{'name': 'state n0', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n1 = Channel(**{'name': 'state n1', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n2 = Channel(**{'name': 'state n2', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n3 = Channel(**{'name': 'state n3', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n4 = Channel(**{'name': 'state n4', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n5 = Channel(**{'name': 'state n5', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n6 = Channel(**{'name': 'state n6', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n7 = Channel(**{'name': 'state n7', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n8 = Channel(**{'name': 'state n8', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.n9 = Channel(**{'name': 'state n9', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.nm = Channel(**{'name': 'state nm', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.phi0 = Channel(**{'name': 'state phi0', 'y_unit': '-', 't_unit': 'h', 'time': t, 'value': y})
+        self.CO2outgas = Channel(**{'name': 'CO2 percent in off-gas', 'y_unit': '%', 't_unit': 'h', 'time': t, 'value': y})
+        self.Culture_age = Channel(**{'name': 'Cell culture age', 'y_unit': 'h', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fpaa = Channel(**{'name': 'PAA flow', 'y_unit': 'PAA flow (L/h)', 't_unit': 'h', 'time': t, 'value': y})
+        self.PAA = Channel(**{'name': 'PAA concen.', 'y_unit': 'PAA (g L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.PAA_offline = Channel(**{'name': 'PAA concen. offline', 'y_unit': 'PAA (g L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.Foil = Channel(**{'name': 'Oil flow', 'y_unit': 'L/hr', 't_unit': 'h', 'time': t, 'value': y})
+        self.NH3 = Channel(**{'name': 'NH_3 concen.', 'y_unit': 'NH3 (g L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.NH3_offline = Channel(**{'name': 'NH_3 concen. off-line', 'y_unit': 'NH3 (g L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.OUR = Channel(**{'name': 'Oxygen Uptake Rate', 'y_unit': '(g min^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.O2 = Channel(**{'name': 'Oxygen in percent in off-gas', 'y_unit': 'O2 (%)', 't_unit': 'h', 'time': t, 'value': y})
+        self.mup = Channel(**{'name': 'Specific growth rate of Penicillin', 'y_unit': 'mu_P (h^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.mux = Channel(**{'name': 'Specific growth rate of Biomass', 'y_unit': 'mu_X (h^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.P_offline = Channel(**{'name': 'Offline Penicillin concen.', 'y_unit': 'P(g L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.X_CER = Channel(**{'name': 'Biomass concen. from CER', 'y_unit': 'g min^{-1}', 't_unit': 'h', 'time': t, 'value': y})
+        self.X_offline = Channel(**{'name': 'Offline Biomass concen.', 'y_unit': 'X(g L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.CER = Channel(**{'name': 'Carbon evolution rate', 'y_unit': 'g/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.mu_X_calc = Channel(**{'name': 'Biomass specific growth rate', 'y_unit': 'hr^{-1}', 't_unit': 'h', 'time': t, 'value': y})
+        self.mu_P_calc = Channel(**{'name': 'Penicillin specific growth rate', 'y_unit': 'hr^{-1}', 't_unit': 'h', 'time': t, 'value': y})
+        self.F_discharge_cal = Channel(**{'name': 'Discharge rate', 'y_unit': 'L hr^{-1}', 't_unit': 'h', 'time': t, 'value': y})
+        self.NH3_shots = Channel(**{'name': 'Ammonia shots', 'y_unit': 'kgs', 't_unit': 'h', 'time': t, 'value': y})
+        self.CO2_d = Channel(**{'name': 'Dissolved CO_2', 'y_unit': '(mg L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
+        self.Viscosity = Channel(**{'name': 'Viscosity', 'y_unit': 'centPoise', 't_unit': 'h', 'time': t, 'value': y})
+        self.Viscosity_offline = Channel(**{'name': 'Viscosity Offline', 'y_unit': 'centPoise', 't_unit': 'h', 'time': t, 'value': y})
+        self.Fault_ref = Channel(**{'name': 'Fault reference', 'y_unit': 'Fault ref', 't_unit': 'h', 'time': t, 'value': y})
+        self.Control_ref = Channel(**{'name': '0-Recipe driven, 1-Operator controlled', 'y_unit': 'Control ref', 't_unit': 'Batch number', 'time': t, 'value': y})
+        self.PAT_ref = Channel(**{'name': '1-No Raman spec, 1-Raman spec recorded, 2-PAT control', 'y_unit': 'PAT ref', 't_unit': 'Batch number', 'time': t, 'value': y})
+        self.Batch_ref = Channel(**{'name': 'Batch reference', 'y_unit': 'Batch ref', 't_unit': 'Batch ref', 'time': t, 'value': y})
+        self.PAA_pred = Channel(**{'name': 'PAA Prediction.', 'y_unit': 'PAA_pred (g L^{-1})', 't_unit': 'h', 'time': t, 'value': y})
         # extra
         self.PRBS_noise_addition = [0] * NUM_STEPS
+        # Raman Spectra: Wavenumber & Intensity
+        Wavenumber = np.zeros((WAVENUMBER_LENGTH, 1), dtype=float)
+        Intensity = np.zeros((NUM_STEPS, WAVENUMBER_LENGTH), dtype=float)
+        self.Raman_Spec = Channel(**{'name': 'Raman Spectra', 'y_unit': 'a.u', 't_unit': 'cm^-1', 'Wavenumber': Wavenumber, 'Intensity': Intensity})
 
 
 class X0:
