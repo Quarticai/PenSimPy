@@ -1,6 +1,7 @@
 import time
 from pensimpy.data.recipe import Recipe
 from pensimpy.peni_env_setup import PenSimEnv
+from pensimpy.data.constants import STEP_IN_MINUTES
 from .agent import Agent
 
 
@@ -14,8 +15,6 @@ def run(episodes=1000):
 
     batch_yield_list = []
     t = time.time()
-
-    MINS_PER_TIME_STEP = 12  # minutes
 
     for e in range(episodes):
         recipe = Recipe.get_default()
@@ -33,7 +32,7 @@ def run(episodes=1000):
             Fs_a, Foil_a, Fg_a, pres_a, Fremoved_a, Fw_a, Fpaa_a = actions
 
             """Get action from recipe agent based on k_timestep"""
-            Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = recipe.get_values_at(k_timestep * MINS_PER_TIME_STEP)
+            Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = recipe.get_values_at(k_timestep * STEP_IN_MINUTES)
 
             """update recipe actions with agent actions"""
             Fs *= (1 + Fs_a)
