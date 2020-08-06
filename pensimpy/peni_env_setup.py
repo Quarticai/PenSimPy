@@ -13,11 +13,11 @@ from pensimpy.data.batch_data import U
 
 from pensimpy.ode.indpensim_ode_py import indpensim_ode_py
 
-from pensimpy.utils.utils import create_batch
-from pensimpy.utils.utils import pid_controller
-from pensimpy.utils.utils import smooth
-from pensimpy.utils.utils import get_dataframe
-from pensimpy.utils.utils import get_observation_data
+from pensimpy.utils import create_batch
+from pensimpy.utils import pid_controller
+from pensimpy.utils import smooth
+from pensimpy.utils import get_dataframe
+from pensimpy.utils import get_observation_data
 import fastodeint
 
 
