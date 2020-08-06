@@ -42,23 +42,23 @@ def run(episodes=1000):
             actions = agent.sample_actions()
 
             """add adjustment to each action"""
-            Fs_a, Foil_a, Fg_a, pres_a, Fremoved_a, Fw_a, Fpaa_a = actions
+            Fs_a, Foil_a, Fg_a, pres_a, discharge_a, Fw_a, Fpaa_a = actions
 
             """Get action from recipe agent based on k_timestep"""
-            Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = recipe.get_values_at(k_timestep * STEP_IN_MINUTES)
+            Fs, Foil, Fg, pressure, discharge, Fw, Fpaa = recipe.get_values_at(k_timestep * STEP_IN_MINUTES)
 
             """update recipe actions with agent actions"""
             Fs *= (1 + Fs_a)
             Foil *= (1 + Foil_a)
             Fg *= (1 + Fg_a)
             pressure *= (1 + pres_a)
-            Fremoved *= (1 + Fremoved_a)
+            discharge *= (1 + discharge_a)
             Fw *= (1 + Fw_a)
             Fpaa *= (1 + Fpaa_a)
 
             observation, batch_data, reward, done = env.step(k_timestep,
                                                              batch_data,
-                                                             Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
+                                                             Fs, Foil, Fg, pressure, discharge, Fw, Fpaa)
             batch_yield += reward
         print(f"episode: {e}, elapsed time: {int(time.time() - t)} s, batch_yield: {batch_yield}")
         batch_yield_list.append(batch_yield)

@@ -63,7 +63,7 @@ def get_dataframe(batch_data, include_raman):
     """
     df = pd.DataFrame(data={"Volume": batch_data.V.y,
                             "Penicillin Concentration": batch_data.P.y,
-                            "Discharge rate": batch_data.Fremoved.y,
+                            "Discharge rate": batch_data.discharge.y,
                             "Sugar feed rate": batch_data.Fs.y,
                             "Soil bean feed rate": batch_data.Foil.y,
                             "Aeration rate": batch_data.Fg.y,
@@ -96,7 +96,7 @@ def get_observation_data(observation, t):
     """
     Get observation data at t.
     """
-    vars = ['Foil', 'Fw', 'Fs', 'Fa', 'Fb', 'Fc', 'Fh', 'Fg', 'Wt', 'Fremoved', 'DO2', 'T', 'O2', 'pressure']
+    vars = ['Foil', 'Fw', 'Fs', 'Fa', 'Fb', 'Fc', 'Fh', 'Fg', 'Wt', 'discharge', 'DO2', 'T', 'O2', 'pressure']
     # convert to pH from H+ concentration
     pH = observation.pH.y[t]
     pH = -math.log(pH) / math.log(10) if pH != 0 else pH

@@ -23,7 +23,7 @@ class X:
         self.Fh = Channel(**{'name': 'Heating water flowrate', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
         self.Fw = Channel(**{'name': 'Water for injection/dilution', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
         self.pressure = Channel(**{'name': 'Air head pressure', 'y_unit': 'bar', 't_unit': 'h', 'time': t, 'value': y})
-        self.Fremoved = Channel(**{'name': 'Dumped broth flow', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
+        self.discharge = Channel(**{'name': 'Dumped broth flow', 'y_unit': 'L/h', 't_unit': 'h', 'time': t, 'value': y})
         self.S = Channel(**{'name': 'Substrate concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
         self.DO2 = Channel(**{'name': 'Dissolved oxygen concen.', 'y_unit': 'mg/L', 't_unit': 'h', 'time': t, 'value': y})
         self.X = Channel(**{'name': 'Biomass concen.', 'y_unit': 'g/L', 't_unit': 'h', 'time': t, 'value': y})
@@ -169,7 +169,7 @@ class U:
         self.Fc = 0
         self.Fh = 0
         self.Fw = 0
-        self.Fremoved = 0
+        self.discharge = 0
         self.Fpaa = 0
         self.RPM = 0
         self.viscosity = 0

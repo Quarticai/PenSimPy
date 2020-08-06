@@ -67,7 +67,7 @@ class PenSimEnv:
         observation = get_observation_data(x, 0)
         return observation, x
 
-    def step(self, k, x, Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa):
+    def step(self, k, x, Fs, Foil, Fg, pressure, discharge, Fw, Fpaa):
         """
         Simulate the fermentation process by solving ODE.
         """
@@ -89,7 +89,7 @@ class PenSimEnv:
             x.T.y[0] = self.x0.T
 
         # apply PID and interpolations
-        u, x = self.integrate_control_strategy(x, k, Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
+        u, x = self.integrate_control_strategy(x, k, Fs, Foil, Fg, pressure, discharge, Fw, Fpaa)
 
         # builds initial conditions and control vectors specific to
         # indpensim_ode using ode45
@@ -173,7 +173,7 @@ class PenSimEnv:
                u.Fw,
                u.pressure,
                u.viscosity,
-               u.Fremoved,
+               u.discharge,
                u.Fpaa,
                u.Foil,
                u.NH3_shots,
@@ -240,8 +240,8 @@ class PenSimEnv:
         x.Fw.y[k - 1] = u.Fw
         x.pressure.t[k - 1] = t_tmp
         x.pressure.y[k - 1] = u.pressure
-        x.Fremoved.t[k - 1] = t_tmp
-        x.Fremoved.y[k - 1] = u.Fremoved
+        x.discharge.t[k - 1] = t_tmp
+        x.discharge.y[k - 1] = u.discharge
 
         # Saving all the  IndPenSim states
         x.S.y[k - 1] = y_sol[0]
@@ -375,8 +375,8 @@ class PenSimEnv:
         peni_yield = x.V.y[k - 1] * x.P.y[k - 1] / 1000
         # peni_yield is accumulated penicillin
         # yield_pre is previous yield
-        # x.Fremoved.y[k - 1] * x.P.y[k - 1] * h / 1000  is the discharged
-        yield_per_run = peni_yield - self.yield_pre - x.Fremoved.y[k - 1] * x.P.y[k - 1] * STEP_IN_HOURS / 1000
+        # x.discharge.y[k - 1] * x.P.y[k - 1] * h / 1000  is the discharged
+        yield_per_run = peni_yield - self.yield_pre - x.discharge.y[k - 1] * x.P.y[k - 1] * STEP_IN_HOURS / 1000
         self.yield_pre = peni_yield
 
         observation = get_observation_data(x, k - 1)
@@ -391,7 +391,7 @@ class PenSimEnv:
 
         return observation, x, yield_per_run, done
 
-    def integrate_control_strategy(self, x, k, Fs_k, Foil_k, Fg_k, pressure_k, Fremoved_k, Fw_k, Fpaa_k):
+    def integrate_control_strategy(self, x, k, Fs_k, Foil_k, Fg_k, pressure_k, discharge_k, Fw_k, Fpaa_k):
         """
         Control strategies: Sequential batch control and PID control.
         """
@@ -535,7 +535,7 @@ class PenSimEnv:
             Foil = Foil_k
             Fg = Fg_k
             pressure = pressure_k
-            Fdischarge = -Fremoved_k
+            discharge = -discharge_k
             Fw = Fw_k
             Fpaa = Fpaa_k
 
@@ -677,7 +677,7 @@ class PenSimEnv:
         u.Fw = Fw
         u.pressure = pressure
         u.viscosity = viscosity
-        u.Fremoved = Fdischarge
+        u.discharge = discharge
         u.Fpaa = Fpaa
         u.Foil = Foil
         u.NH3_shots = self.xinterp.NH3_shots.y[k - 1]
@@ -776,14 +776,14 @@ class PenSimEnv:
         while not done:
             k_timestep += 1
             # Get action from recipe agent based on time
-            Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa = self.recipe.get_values_at(k_timestep * STEP_IN_MINUTES)
+            Fs, Foil, Fg, pressure, discharge, Fw, Fpaa = self.recipe.get_values_at(k_timestep * STEP_IN_MINUTES)
 
             # Run and get the reward
             # observation is a class which contains all the variables, e.g. observation.Fs.y[k], observation.Fs.t[k]
             # are the Fs value and corresponding time at k
             observation, batch_data, reward, done = self.step(k_timestep,
                                                               batch_data,
-                                                              Fs, Foil, Fg, pressure, Fremoved, Fw, Fpaa)
+                                                              Fs, Foil, Fg, pressure, discharge, Fw, Fpaa)
             batch_yield += reward
 
         print(f"=== Yield {round(batch_yield, 6)} Kg in {round(time.time() - t, 3)}s")
