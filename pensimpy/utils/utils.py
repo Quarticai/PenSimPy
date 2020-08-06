@@ -1,9 +1,7 @@
 import numpy as np
-import itertools
 import pandas as pd
 import math
 from scipy.signal import lfilter
-from scipy.signal import savgol_filter
 from pensimpy.data.batch_data import X
 from pensimpy.data.channel import Channel
 
@@ -150,32 +148,6 @@ def smooth(y, width):
     c_new.extend(c[width - 1:].tolist())
     c_new.extend(cend)
     return c_new
-
-
-def predict_substrate(k, x, model_data):
-    Raman_Spec_sg = savgol_filter(x.Raman_Spec.Intensity[k-2, :], 5, 2)
-    Raman_Spec_sg_d = np.diff(Raman_Spec_sg)
-    PAA_peaks_Spec = []
-    PAA_peaks_Spec.extend(Raman_Spec_sg_d[349:500])
-    PAA_peaks_Spec.extend(Raman_Spec_sg_d[799:860])
-    x.PAA_pred.y[k - 2] = np.dot(np.array([PAA_peaks_Spec]), np.array([model_data]).T)[0]
-    if k > 21:
-        x.PAA_pred.y[k - 2] = (x.PAA_pred.y[k - 3] + x.PAA_pred.y[k - 4] + x.PAA_pred.y[k - 2]) / 3
-    return x
-
-
-def get_recipe_trend(recipe_list):
-    """
-    Get the recipe trend data
-    :param recipe:
-    :param recipe_sp:
-    :return:
-    """
-    recipe = [int(ele / 0.2) for ele in recipe_list[0]]
-    recipe = [recipe[0]] + np.diff(recipe).tolist()
-    recipe_sp = [[ele] for ele in recipe_list[1]]
-    res_default = [x * y for x, y in zip(recipe, recipe_sp)]
-    return list(itertools.chain(*res_default))[0:1150]
 
 
 def get_dataframe(batch_data, include_raman):
