@@ -3,7 +3,7 @@ import math
 
 def indpensim_ode_py(t, y, par):
     """
-    ODE for penicillin proecss
+    ODE for penicillin process.
     :param t: time span
     :param y: initial condition
     :param par: inputs + params
