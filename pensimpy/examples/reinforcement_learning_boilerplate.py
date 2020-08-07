@@ -3,7 +3,7 @@ import random
 import numpy as np
 from pensimpy.data.recipe import Recipe
 from pensimpy.peni_env_setup import PenSimEnv
-from pensimpy.data.constants import STEP_IN_MINUTES
+from pensimpy.constants import STEP_IN_MINUTES
 
 
 class Agent:

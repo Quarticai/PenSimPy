@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import math
 from scipy.signal import lfilter
-from pensimpy.data.constants import NUM_STEPS, STEP_IN_HOURS
+from pensimpy.constants import NUM_STEPS, STEP_IN_HOURS
 
 
 def pid_controller(uk1, ek, ek1, yk, yk1, yk2, u_min, u_max, Kp, Ti, Td, h):

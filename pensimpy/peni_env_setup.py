@@ -5,7 +5,7 @@ from scipy.integrate import odeint
 from scipy.interpolate import interp1d
 from pensimpy.data.ctrl_flags import CtrlFlags
 from pensimpy.data.batch_data import X0, Xinterp, U, X
-from pensimpy.data.constants import RAMAN_SPECTRA, RAMAN_WAVENUMBER, STEP_IN_MINUTES, BATCH_LENGTH_IN_HOURS, STEP_IN_HOURS, NUM_STEPS, WAVENUMBER_LENGTH
+from pensimpy.constants import RAMAN_SPECTRA, RAMAN_WAVENUMBER, STEP_IN_MINUTES, BATCH_LENGTH_IN_HOURS, STEP_IN_HOURS, NUM_STEPS, WAVENUMBER_LENGTH
 from pensimpy.ode.indpensim_ode_py import indpensim_ode_py
 from pensimpy.utils import pid_controller, smooth, get_dataframe, get_observation_data
 import fastodeint

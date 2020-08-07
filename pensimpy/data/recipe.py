@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from itertools import chain
-from pensimpy.data.constants import MINUTES_PER_HOUR
+from pensimpy.constants import MINUTES_PER_HOUR
 
 
 class Setpoint:
