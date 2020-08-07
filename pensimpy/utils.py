@@ -50,8 +50,7 @@ def smooth(y, width):
     cbegin = cbegin[::2] / np.arange(1, width - 1, 2)
     cend = np.cumsum(y[n - width + 2:n][::-1])
     cend = cend[::-2] / np.arange(1, width - 1)[::-2]
-    c_new = []
-    c_new.extend(cbegin)
+    c_new = list(cbegin)
     c_new.extend(c[width - 1:].tolist())
     c_new.extend(cend)
     return c_new
