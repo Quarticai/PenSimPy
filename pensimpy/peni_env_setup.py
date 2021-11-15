@@ -16,6 +16,7 @@ class PenSimEnv:
     Class for setting up the simulation environment, simulating the penicillin yield process with Raman spectra, and
     generating the batch data and Raman spectra data in pandas dataframe.
     """
+
     def __init__(self, recipe_combo, fast=True):
         self.xinterp = None
         self.x0 = None
@@ -335,7 +336,7 @@ class PenSimEnv:
 
         # Calculating the CER
         x.CER.y[k - 1] = (1.9642857142857144 * x.Fg.y[k - 1]) * (
-                (0.0065 * x.CO2outgas.y[k - 1]) * (0.7902 / (1 - O2_in - x.CO2outgas.y[k - 1] / 100) - 0.0330))
+            (0.0065 * x.CO2outgas.y[k - 1]) * (0.7902 / (1 - O2_in - x.CO2outgas.y[k - 1] / 100) - 0.0330))
         x.CER.t[k - 1] = t_tmp
 
         # Adding in Raman Spectra
@@ -439,9 +440,11 @@ class PenSimEnv:
         if ph_err >= -0.05:
             ph_on_off = 1
             if k == 1:
-                Fb = pid_controller(x.Fb.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, STEP_IN_HOURS)
+                Fb = pid_controller(x.Fb.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8,
+                                    STEP_IN_HOURS)
             else:
-                Fb = pid_controller(x.Fb.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8, STEP_IN_HOURS)
+                Fb = pid_controller(x.Fb.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 4.0000e-05, 8,
+                                    STEP_IN_HOURS)
             Fa = 0
         elif ph_err <= -0.05:
             ph_on_off = 1
@@ -449,7 +452,8 @@ class PenSimEnv:
                 Fa = pid_controller(x.Fa.y[0], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, STEP_IN_HOURS)
                 Fb = 0
             else:
-                Fa = pid_controller(x.Fa.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125, STEP_IN_HOURS)
+                Fa = pid_controller(x.Fa.y[k - 2], ph_err, ph_err1, ph, ph1, ph2, 0, 225, 8e-2, 12.5, 0.125,
+                                    STEP_IN_HOURS)
                 Fb = x.Fb.y[k - 2] * 0.5
         else:
             ph_on_off = 0
@@ -500,18 +504,22 @@ class PenSimEnv:
         if temp_err <= 0.05:
             temp_on_off = 0
             if k == 1:
-                Fc = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, STEP_IN_HOURS)
+                Fc = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005,
+                                    STEP_IN_HOURS)
                 Fh = 0
             else:
-                Fc = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005, STEP_IN_HOURS)
+                Fc = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, -300, 1.6, 0.005,
+                                    STEP_IN_HOURS)
                 Fh = x.Fh.y[k - 2] * 0.1
         else:
             temp_on_off = 1
             if k == 1:
-                Fh = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, STEP_IN_HOURS)
+                Fh = pid_controller(x.Fc.y[0], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1,
+                                    STEP_IN_HOURS)
                 Fc = 0
             else:
-                Fh = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1, STEP_IN_HOURS)
+                Fh = pid_controller(x.Fc.y[k - 2], temp_err, temp_err1, temp, temp1, temp2, 0, 1.5e3, 50, 0.050, 1,
+                                    STEP_IN_HOURS)
                 Fc = x.Fc.y[k - 2] * 0.3
         Fc = 1e-4 if Fc < 1e-4 else Fc
         Fh = 1e-4 if Fh < 1e-4 else Fh
@@ -660,9 +668,11 @@ class PenSimEnv:
                     temp2 = x.PAA_pred.y[k - 5]
 
                 if k == 1:
-                    Fpaa = pid_controller(x.Fpaa.y[0], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, STEP_IN_HOURS)
+                    Fpaa = pid_controller(x.Fpaa.y[0], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0,
+                                          STEP_IN_HOURS)
                 else:
-                    Fpaa = pid_controller(x.Fpaa.y[k - 2], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0, STEP_IN_HOURS)
+                    Fpaa = pid_controller(x.Fpaa.y[k - 2], PAA_err, PAA_err1, temp, temp1, temp2, 0, 150, 0.1, 0.50, 0,
+                                          STEP_IN_HOURS)
 
         # Controller vector
         u.Fg = Fg
@@ -730,20 +740,25 @@ class PenSimEnv:
 
         # Glucose peaks
         # Peak A
-        Glucose_raw_peaks_G_peaka[78: 359, 0] = 0.011398350868612364 * np.exp(-0.0004081632653061224 * np.arange(-140, 141) ** 2)
+        Glucose_raw_peaks_G_peaka[78: 359, 0] = 0.011398350868612364 * np.exp(
+            -0.0004081632653061224 * np.arange(-140, 141) ** 2)
         # Peak B
         Glucose_raw_peaks_G_peakb[598: 679, 0] = 0.009277727451196111 * np.exp(-0.005 * np.arange(-40, 41) ** 2)
         # Peak C
         Glucose_raw_peaks_G_peakc[852: 1253, 0] = 0.007978845608028654 * np.exp(-0.0002 * np.arange(-200, 201) ** 2)
         # PAA  peaks
         # Peak A
-        PAA_raw_peaks_G_peaka[298: 539, 0] = 0.01329807601338109 * np.exp(-0.0005555555555555556 * np.arange(-120, 121) ** 2)
+        PAA_raw_peaks_G_peaka[298: 539, 0] = 0.01329807601338109 * np.exp(
+            -0.0005555555555555556 * np.arange(-120, 121) ** 2)
         # Peak B
-        PAA_raw_peaks_G_peakb[808: 869, 0] = 0.01237030326826148 * np.exp(-0.008888888888888889 * np.arange(-30, 31) ** 2)
+        PAA_raw_peaks_G_peakb[808: 869, 0] = 0.01237030326826148 * np.exp(
+            -0.008888888888888889 * np.arange(-30, 31) ** 2)
         # Adding in  Peak aPen G Peak
-        Product_raw_peaka[679: 920, 0] = 0.02659615202676218 * np.exp(-0.0022222222222222222 * np.arange(-120, 121) ** 2)
+        Product_raw_peaka[679: 920, 0] = 0.02659615202676218 * np.exp(
+            -0.0022222222222222222 * np.arange(-120, 121) ** 2)
         # Adding in  Peak b for Pen G Peak
-        Product_raw_peakb[299: 2100, 0] = 0.02659615202676218 * np.exp(-0.0022222222222222222 * np.arange(-900, 901) ** 2)
+        Product_raw_peakb[299: 2100, 0] = 0.02659615202676218 * np.exp(
+            -0.0022222222222222222 * np.arange(-900, 901) ** 2)
 
         total_peaks_G = Glucose_raw_peaks_G_peaka + Glucose_raw_peaks_G_peakb + Glucose_raw_peaks_G_peakc
         total_peaks_PAA = PAA_raw_peaks_G_peaka + PAA_raw_peaks_G_peakb
@@ -778,7 +793,7 @@ class PenSimEnv:
             values_dict = self.recipe_combo.get_values_dict_at(time=k_timestep * STEP_IN_MINUTES / MINUTES_PER_HOUR)
             Fs, Foil, Fg, pressure, discharge, Fw, Fpaa = values_dict['Fs'], values_dict['Foil'], values_dict['Fg'], \
                                                           values_dict['pressure'], values_dict['discharge'], \
-                                                          values_dict['Fw'],  values_dict['Fpaa']
+                                                          values_dict['Fw'], values_dict['Fpaa']
 
             # Run and get the reward
             # observation is a class which contains all the variables, e.g. observation.Fs.y[k], observation.Fs.t[k]
