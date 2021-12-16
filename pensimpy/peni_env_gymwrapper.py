@@ -190,17 +190,17 @@ class PeniControlData:
             tmp_terminals = []
             with codecs.open(file_path, 'r', encoding='utf-8') as fp:
                 csv_reader = csv.reader(fp, delimiter=self.delimiter)
-                next(csv_reader) 
+                next(csv_reader)
+                terminal = False
                 # get rid of the first line containing only titles
                 for row in csv_reader:
-                    observation = [row[0]] + row[7:-1] 
+                    observation = [row[0]] + row[7:-1]
                     # there are 9 items: Time Step, pH,Temperature,Acid flow rate,Base flow rate,Cooling water,Heating water,Vessel Weight,Dissolved oxygen concentration
                     assert len(observation) == self.state_dim
-                    action = [row[1], row[2], row[3], row[4], row[5], row[6]] 
+                    action = [row[1], row[2], row[3], row[4], row[5], row[6]]
                     # there are 6 items: Discharge rate,Sugar feed rate,Soil bean feed rate,Aeration rate,Back pressure,Water injection/dilution
                     assert len(action) == self.action_dim
                     reward = row[-1]
-                    terminal = False
                     tmp_observations.append(observation)
                     tmp_actions.append(action)
                     tmp_rewards.append(reward)
